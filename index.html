@@ -42,7 +42,6 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
-        // Расширенный словарь категорий
         const DICTIONARY = {
             'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш'],
             'птица': ['куриц', 'кура', 'индеик', 'утк', 'гусь', 'крылышк', 'филе'],
@@ -125,13 +124,29 @@
             const [toast, setToast] = useState(null);
             const [editingItem, setEditingItem] = useState(null);
             const [isListening, setIsListening] = useState(false);
+            const [pendingImport, setPendingImport] = useState(null);
 
-            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_items_v25')) || {});
-            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_hist_v25')) || []);
+            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_items_v26')) || {});
+            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_hist_v26')) || []);
+
+            // ИНИЦИАЛИЗАЦИЯ: Проверка данных в URL
+            useEffect(() => {
+                const hash = window.location.hash;
+                if (hash && hash.startsWith('#data=')) {
+                    try {
+                        const base64 = hash.split('data=')[1];
+                        const json = decodeURIComponent(escape(atob(base64)));
+                        const sharedData = JSON.parse(json);
+                        setPendingImport(sharedData);
+                    } catch (e) {
+                        console.error("Failed to parse shared list", e);
+                    }
+                }
+            }, []);
 
             useEffect(() => {
-                localStorage.setItem('ss_items_v25', JSON.stringify(items));
-                localStorage.setItem('ss_hist_v25', JSON.stringify(history));
+                localStorage.setItem('ss_items_v26', JSON.stringify(items));
+                localStorage.setItem('ss_hist_v26', JSON.stringify(history));
             }, [items, history]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
@@ -208,25 +223,44 @@
                 setItems({...items, [activeLoc]: updatedList});
             };
 
-            const generateShareText = () => {
-                let text = `🛒 СПИСОК ПОКУПОК:\n\n`;
+            const handleImport = () => {
+                if (!pendingImport) return;
+                // Объединяем или заменяем (тут заменяем для чистоты)
+                setItems(prev => ({...prev, [activeLoc]: pendingImport}));
+                setPendingImport(null);
+                window.location.hash = "";
+                showToast("Список загружен!");
+            };
+
+            // ФОРМИРОВАНИЕ ТЕКСТА И "МАГИЧЕСКОЙ ССЫЛКИ"
+            const generateSharePackage = () => {
                 const locItems = items[activeLoc] || [];
                 if (locItems.length === 0) return "Список пуст";
+
+                let text = `🛒 СПИСОК ПОКУПОК (${activeLoc.toUpperCase()}):\n\n`;
                 const currentGrouped = {};
                 locItems.forEach(item => {
                     if (!currentGrouped[item.category]) currentGrouped[item.category] = [];
                     currentGrouped[item.category].push(item);
                 });
+
                 CATEGORIES.forEach(cat => {
                     if (currentGrouped[cat.id]) {
-                        text += `--- ${cat.icon} ${cat.label.toUpperCase()} ---\n`;
+                        text += `${cat.icon} ${cat.label.toUpperCase()}\n`;
                         currentGrouped[cat.id].forEach(item => {
-                            const status = item.completed ? '✅' : '⚪';
-                            text += `${status} ${item.text} (${item.quantity} ${item.unit})\n`;
+                            const marker = item.completed ? '[x]' : '[ ]';
+                            text += `${marker} ${item.text} (${item.quantity} ${item.unit})\n`;
                         });
                         text += '\n';
                     }
                 });
+
+                // Генерация ссылки
+                const dataStr = JSON.stringify(locItems);
+                const base64 = btoa(unescape(encodeURIComponent(dataStr)));
+                const magicLink = `${window.location.origin}${window.location.pathname}#data=${base64}`;
+
+                text += `🔗 Открыть и отмечать галочками:\n${magicLink}`;
                 return text;
             };
 
@@ -237,7 +271,7 @@
                 textArea.style.left = "-9999px";
                 document.body.appendChild(textArea); textArea.select();
                 document.execCommand('copy'); document.body.removeChild(textArea);
-                showToast('Список скопирован!');
+                showToast('Текст и ссылка скопированы!');
             };
 
             const groupedHistory = useMemo(() => {
@@ -352,7 +386,7 @@
                                 </main>
 
                                 <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white/95 to-transparent z-40 flex items-center gap-3">
-                                    <button onClick={() => copyToClipboard(generateShareText())} className="flex-1 h-16 bg-[#121221] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all">🚀 В ТЕЛЕГРАМ</button>
+                                    <button onClick={() => copyToClipboard(generateSharePackage())} className="flex-1 h-16 bg-[#121221] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all">🚀 В ТЕЛЕГРАМ</button>
                                     <button onClick={startVoice} className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-xl transition-all active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white hover:bg-[#4B43B2]'}`}><IconMic /></button>
                                     <button onClick={() => { const d = JSON.stringify({ items, history }, null, 2); const uri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(d); const l = document.createElement('a'); l.href = uri; l.download = 'shopping.json'; l.click(); }} className="w-16 h-16 bg-white border-2 border-slate-100 text-slate-300 rounded-[24px] flex items-center justify-center shadow-lg transition-all active:scale-95 text-lg">💾</button>
                                 </div>
@@ -378,6 +412,20 @@
                             </main>
                         )}
 
+                        {/* МОДАЛЬНОЕ ОКНО ИМПОРТА */}
+                        {pendingImport && (
+                            <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] flex items-center justify-center p-6">
+                                <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-pop">
+                                    <h2 className="text-xl font-black mb-4">Получен список!</h2>
+                                    <p className="text-sm text-slate-500 mb-8 font-medium">Родственники поделились списком продуктов. Хотите загрузить его в приложение?</p>
+                                    <div className="flex gap-3">
+                                        <button onClick={() => setPendingImport(null)} className="flex-1 py-4 rounded-2xl bg-slate-100 font-black text-[10px] uppercase tracking-widest text-slate-400">Отмена</button>
+                                        <button onClick={handleImport} className="flex-[2] py-4 rounded-2xl bg-[#635BFF] font-black text-[10px] uppercase tracking-widest text-white shadow-lg">Загрузить</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {editingItem && (
                             <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-4">
                                 <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-pop border border-white no-scrollbar overflow-y-auto max-h-[90vh]">
@@ -388,7 +436,6 @@
                                         <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Приоритет</label><div className="flex gap-2">{PRIORITIES.map(p => (<button key={p.id} onClick={() => setEditingItem({...editingItem, priority: p.id})} className={`flex-1 py-3 rounded-xl transition-all border-2 flex items-center justify-center ${editingItem.priority === p.id ? `border-[#635BFF] ${p.color}` : 'border-transparent bg-slate-50 text-slate-400'}`}>{p.icon}</button>))}</div></div>
                                         <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Локация</label><div className="grid grid-cols-3 gap-2">{LOCATIONS.map(l => (<button key={l.id} onClick={() => setEditingItem({...editingItem, location: l.id})} className={`py-3 rounded-xl text-[10px] font-black border-2 flex flex-col items-center gap-1 ${editingItem.location === l.id ? 'border-[#635BFF] bg-indigo-50 text-[#635BFF]' : 'border-transparent bg-slate-50 text-slate-400'}`}><span>{l.icon}</span> {l.label}</button>))}</div></div>
                                         
-                                        {/* ВЫПАДАЮЩИЙ СПИСОК КАТЕГОРИЙ */}
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Категория</label>
                                             <div className="relative">
