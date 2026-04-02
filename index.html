@@ -16,13 +16,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Manrope', 'sans-serif'] },
-                } 
-            } 
-        }
+        // Безопасная инициализация Tailwind Config
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.tailwind) {
+                tailwind.config = { 
+                    theme: { 
+                        extend: { 
+                            fontFamily: { sans: ['Manrope', 'sans-serif'] },
+                        } 
+                    } 
+                }
+            }
+        });
     </script>
 
     <style>
@@ -59,8 +64,10 @@
             Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
             X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             History: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>,
+            Back: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
             ChevronDown: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
-            Download: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            File: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>,
+            Copy: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
         };
 
         const DICTIONARY = {
@@ -92,7 +99,12 @@
             const PRIORITIES = [{ id: 'low', icon: '🕒', color: 'text-slate-400 bg-slate-50' }, { id: 'medium', icon: '➖', color: 'text-[#635BFF] bg-indigo-50' }, { id: 'high', icon: '⚡', color: 'text-red-500 bg-red-50' }];
             const LOCATIONS = [{ id: 'магазин', label: 'Магазин', icon: '🛒' }, { id: 'рынок', label: 'Рынок', icon: '🧺' }, { id: 'онлайн', label: 'Онлайн', icon: '🚚' }];
 
-            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_v400_items')) || {});
+            const [items, setItems] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('ss_v600_items');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (e) { return {}; }
+            });
             const [activeLoc, setActiveLoc] = useState('магазин');
             const [inputValue, setInputValue] = useState('');
             const [inputQty, setInputQty] = useState('1');
@@ -104,7 +116,7 @@
             const [isListening, setIsListening] = useState(false);
 
             useEffect(() => {
-                localStorage.setItem('ss_v400_items', JSON.stringify(items));
+                localStorage.setItem('ss_v600_items', JSON.stringify(items));
             }, [items]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -138,6 +150,7 @@
                     showToast(`Определено: ${p.name}`); setIsListening(false); 
                 };
                 rec.onerror = () => setIsListening(false);
+                rec.onend = () => setIsListening(false);
                 rec.start();
             };
 
@@ -156,12 +169,20 @@
                 setItems({...items, [activeLoc]: list});
             };
 
-            // ГЕНЕРАЦИЯ ИНТЕРАКТИВНОГО ФАЙЛА ДЛЯ СКАЧИВАНИЯ
+            const copyToClipboard = () => {
+                const locItems = items[activeLoc] || [];
+                if (!locItems.length) return showToast("Список пуст");
+                const text = locItems.map(i => `${i.completed ? '✅' : '⬜'} ${i.text} (${i.quantity} ${i.unit})`).join('\n');
+                const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el);
+                el.select(); document.execCommand('copy'); document.body.removeChild(el);
+                showToast("Текст списка скопирован!");
+            };
+
             const downloadSpisok = () => {
                 const locItems = items[activeLoc] || [];
                 if (!locItems.length) return showToast("Список пуст");
 
-                const listId = "list_" + Date.now(); // Уникальный ID для сохранения галочек
+                const listId = "list_" + Date.now();
                 const itemsJson = JSON.stringify(locItems).replace(/</g, '\\u003c');
                 
                 const fileContent = `
@@ -180,34 +201,27 @@
         .done { opacity: 0.4; }
         .done .checkbox { background: #10b981; border-color: #10b981; }
         .done .checkbox::after { content: '✔'; color: white; font-weight: bold; font-size: 18px; }
-        .done .text { text-decoration: line-through; }
         .text { font-size: 18px; font-weight: 600; flex: 1; }
+        .done .text { text-decoration: line-through; }
         .qty { color: #635bff; font-weight: 800; font-size: 14px; margin-left: 10px; }
-        .btn { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 16px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-copy { background: #1e293b; color: white; }
-        .btn-reset { background: #f1f5f9; color: #64748b; margin-top: 10px; }
-        .alert { background: #fffbeb; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; text-align: center; color: #92400e; border: 1px solid #fef3c7; }
+        .btn-reset { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; background: #f1f5f9; color: #64748b; }
+        .alert { background: #fffbeb; padding: 12px; border-radius: 12px; font-size: 13px; margin-bottom: 20px; color: #92400e; border: 1px solid #fef3c7; line-height: 1.4; text-align: center; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="alert">Чтобы галочки сохранились, если вы открыли файл в Telegram — нажмите три точки в углу и выберите «Открыть в браузере».</div>
-        <h1>🛒 Список покупок</h1>
+        <div class="alert">⚠️ <b>Для работы кнопок:</b> Нажмите иконку "Поделиться" и выберите <b>"Открыть в Safari"</b> (или Chrome).</div>
+        <h1>🛒 Мой список</h1>
         <div id="list"></div>
-        <button class="btn btn-copy" onclick="copyRemaining()">📋 Копировать что осталось</button>
-        <button class="btn btn-reset" onclick="resetAll()">🔄 Сбросить все отметки</button>
+        <button class="btn-reset" onclick="resetAll()">🔄 Сбросить отметки</button>
     </div>
     <script>
         const listId = "${listId}";
         let data = ${itemsJson};
-        
-        // Загрузка состояния из локальной памяти устройства
         const saved = localStorage.getItem(listId);
         if (saved) {
-            const states = JSON.parse(saved);
-            data.forEach(i => { if(states[i.id] !== undefined) i.completed = states[i.id]; });
+            try { const states = JSON.parse(saved); data.forEach(i => { if(states[i.id] !== undefined) i.completed = states[i.id]; }); } catch(e) {}
         }
-
         function render() {
             const c = document.getElementById('list'); c.innerHTML = '';
             data.forEach((i, idx) => {
@@ -218,42 +232,17 @@
                 c.appendChild(d);
             });
         }
-
-        function save() {
-            const states = {}; data.forEach(i => states[i.id] = i.completed);
-            localStorage.setItem(listId, JSON.stringify(states));
-        }
-
-        function resetAll() {
-            if(confirm('Очистить все отметки?')) {
-                data.forEach(i => i.completed = false);
-                save(); render();
-            }
-        }
-
-        function copyRemaining() {
-            const rem = data.filter(i => !i.completed).map(i => "⬜ " + i.text + " (" + i.quantity + " " + i.unit + ")").join('\\n');
-            const el = document.createElement('textarea');
-            el.value = rem || "Всё куплено! 🎉";
-            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            alert('Список некупленного скопирован!');
-        }
-
+        function save() { const states = {}; data.forEach(i => states[i.id] = i.completed); localStorage.setItem(listId, JSON.stringify(states)); }
+        function resetAll() { if(confirm('Сбросить?')) { data.forEach(i => i.completed = false); save(); render(); } }
         render();
     <\/script>
 </body>
 </html>`;
                 
                 const blob = new Blob([fileContent], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = "spisok.html";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                showToast("Файл сохранен! Теперь отправьте его через скрепку в Telegram.");
+                const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                link.download = "spisok.html"; link.click();
+                showToast("Файл скачан! Отправьте его как документ.");
             };
 
             const stats = useMemo(() => {
@@ -306,13 +295,9 @@
                                                 <input type="number" step="any" className="w-full bg-transparent font-black text-[#635BFF] text-lg outline-none" value={inputQty} onChange={(e) => setInputQty(e.target.value)} />
                                                 <select className="bg-transparent font-black text-slate-400 text-xs appearance-none ml-2 outline-none" value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select>
                                             </div>
-                                            <div className="flex-1 flex gap-1">
-                                                {PRIORITIES.map(p => (
-                                                    <button key={p.id} onClick={() => setActivePriority(p.id)} className={`flex-1 rounded-xl flex items-center justify-center transition-all border-2 ${activePriority === p.id ? `border-[#635BFF]/30 ${p.color}` : 'bg-slate-50 border-transparent text-slate-300'}`}>
-                                                        {p.icon}
-                                                    </button>
-                                                ))}
-                                            </div>
+                                            <button onClick={startVoice} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-indigo-50 text-[#635BFF]'}`}>
+                                                <Icons.Mic />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -326,29 +311,26 @@
                                                 const catItems = items[activeLoc].filter(i => i.category === cat.id).sort((a, b) => a.completed - b.completed);
                                                 return (
                                                     <div key={cat.id} className="animate-pop">
-                                                        <div className="flex items-center gap-3 mb-3 px-1">
+                                                        <div className="flex items-center gap-3 mb-2 px-1">
                                                             <span className={`text-sm font-black uppercase tracking-widest ${cat.color}`}>{cat.icon} {cat.label}</span>
                                                             <div className="h-[1px] flex-1 bg-slate-100"></div>
                                                         </div>
                                                         <div className="space-y-1.5">
-                                                            {catItems.map(item => {
-                                                                const pObj = PRIORITIES.find(p => p.id === item.priority) || PRIORITIES[1];
-                                                                return (
-                                                                    <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
-                                                                        <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
-                                                                            {item.completed && <Icons.Check />}
-                                                                        </div>
-                                                                        <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
-                                                                            <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
-                                                                            <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
-                                                                        </div>
-                                                                        <div className="flex gap-1 shrink-0">
-                                                                            <button onClick={() => setEditingItem(item)} className="p-2 text-slate-300 hover:text-[#635BFF] transition-all"><Icons.Brush /></button>
-                                                                            <button onClick={() => setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}))} className="p-2 text-slate-300 hover:text-red-400 transition-all"><Icons.X /></button>
-                                                                        </div>
+                                                            {catItems.map(item => (
+                                                                <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
+                                                                    <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
+                                                                        {item.completed && <Icons.Check />}
                                                                     </div>
-                                                                );
-                                                            })}
+                                                                    <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
+                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
+                                                                        <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
+                                                                    </div>
+                                                                    <div className="flex gap-1 shrink-0">
+                                                                        <button onClick={() => setEditingItem(item)} className="p-2 text-slate-300 hover:text-[#635BFF] transition-all"><Icons.Brush /></button>
+                                                                        <button onClick={() => setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}))} className="p-2 text-slate-300 hover:text-red-400 transition-all"><Icons.X /></button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 );
@@ -359,9 +341,11 @@
 
                                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-40 flex items-center gap-3">
                                     <button onClick={downloadSpisok} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
-                                        <Icons.Download /> СКАЧАТЬ ФАЙЛ СПИСКА
+                                        <Icons.File /> ФАЙЛ
                                     </button>
-                                    <button onClick={startVoice} className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white hover:bg-indigo-500'}`}><Icons.Mic /></button>
+                                    <button onClick={copyToClipboard} className="flex-1 h-16 bg-white border-2 border-slate-100 text-slate-500 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-all">
+                                        <Icons.Copy /> ТЕКСТ
+                                    </button>
                                 </div>
                             </>
                         ) : (
