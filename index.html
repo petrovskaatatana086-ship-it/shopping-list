@@ -36,7 +36,7 @@
             overscroll-behavior-y: contain; 
             background-color: #f8fafc;
             font-family: 'Manrope', sans-serif;
-            font-size: 17px; 
+            font-size: 16px; 
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -45,15 +45,13 @@
         @keyframes pop { from { transform: scale(0.98); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .mic-pulse { animation: pulse-red 1.5s infinite; }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .zap-pulse { animation: zap 1.2s infinite; }
-        @keyframes zap { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useCallback } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const Icons = {
             Plus: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
@@ -63,100 +61,115 @@
             X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             History: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>,
             Back: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-            ChevronDown: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
             Link: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>,
             Copy: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
             Trash: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         };
 
         const CATEGORIES = [
-            { id: 'овощи', label: 'Овощи/Фрукты', icon: '🥦', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-            { id: 'мясо', label: 'Мясо/Рыба', icon: '🥩', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
-            { id: 'молочка', label: 'Молочное', icon: '🥛', color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
-            { id: 'бакалея', label: 'Бакалея', icon: '🍞', color: 'text-stone-600', bg: 'bg-stone-50', border: 'border-stone-100' },
-            { id: 'соусы', label: 'Соусы', icon: '🧴', color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-100' },
-            { id: 'красота', label: 'Красота и уход', icon: '🧼', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
-            { id: 'хозтовары', label: 'Хоз.товары', icon: '🏠', color: 'text-cyan-700', bg: 'bg-cyan-50', border: 'border-cyan-100' },
-            { id: 'другое', label: 'Другое', icon: '📦', color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-100' },
+            { id: 'овощи', label: 'Овощи', icon: '🍅', color: 'text-emerald-600' },
+            { id: 'фрукты', label: 'Фрукты', icon: '🍎', color: 'text-red-500' },
+            { id: 'зелень', label: 'Зелень', icon: '🌿', color: 'text-green-600' },
+            { id: 'грибы', label: 'Грибы', icon: '🍄', color: 'text-stone-500' },
+            { id: 'мясо', label: 'Мясо', icon: '🥩', color: 'text-red-700' },
+            { id: 'птица', label: 'Птица', icon: '🍗', color: 'text-orange-600' },
+            { id: 'субпродукты', label: 'Субпродукты', icon: '🥘', color: 'text-red-900' },
+            { id: 'молочка', label: 'Молочка', icon: '🥛', color: 'text-sky-600' },
+            { id: 'яйца', label: 'Яйца', icon: '🥚', color: 'text-yellow-600' },
+            { id: 'бакалея', label: 'Бакалея', icon: '🍞', color: 'text-stone-600' },
+            { id: 'масло_специи', label: 'Масло и специи', icon: '🧂', color: 'text-yellow-700' },
+            { id: 'орехи', label: 'Орехи', icon: '🥜', color: 'text-amber-800' },
+            { id: 'злаки', label: 'Злаки', icon: '🌾', color: 'text-yellow-500' },
+            { id: 'сладости', label: 'Сладости', icon: '🍫', color: 'text-pink-500' },
+            { id: 'кондитерка', label: 'Кондитерка', icon: '🍰', color: 'text-pink-400' },
+            { id: 'напитки', label: 'Напитки', icon: '🧃', color: 'text-purple-600' },
+            { id: 'аптека', label: 'Аптека', icon: '💊', color: 'text-blue-500' },
+            { id: 'красота', label: 'Красота', icon: '🧼', color: 'text-purple-500' },
+            { id: 'хозтовары', label: 'Хозтовары', icon: '🏠', color: 'text-slate-600' },
+            { id: 'другое', label: 'Другое', icon: '📦', color: 'text-slate-400' },
         ];
 
         const DICTIONARY = {
-            'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш', 'куриц', 'кура', 'индеик', 'рыб', 'лосось', 'форель'],
-            'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк', 'яйц'],
-            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'яблок', 'апелс', 'банан', 'груш'],
-            'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'рис', 'гречк', 'крупа'],
-            'соусы': ['майонез', 'кетчуп', 'соев', 'горчиц', 'соус', 'аджик'],
-            'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи', 'дезодор', 'ватн', 'бритв'],
+            'овощи': ['картоф', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач', 'тыква', 'чеснок'],
+            'фрукты': ['яблок', 'апелс', 'банан', 'груш', 'цитрус', 'лимон', 'клубник', 'вишн', 'персик', 'абрикос', 'виноград', 'манго'],
+            'зелень': ['салат', 'укроп', 'петрушк', 'кинза', 'базилик', 'шпинат', 'зелен'],
+            'грибы': ['гриб', 'шампиньон', 'вешенк'],
+            'мясо': ['говяд', 'свин', 'баран', 'мяс', 'стейк', 'фарш'],
+            'птица': ['куриц', 'кура', 'индеик', 'утк', 'гусь', 'филе'],
+            'субпродукты': ['печен', 'язык', 'сердце', 'желуд'],
+            'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк'],
+            'яйца': ['яйц'],
+            'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'рис', 'гречк'],
+            'масло_специи': ['масло', 'спец', 'перец', 'уксус', 'кетчуп', 'майонез', 'соус', 'горчиц'],
+            'орехи': ['орех', 'фундук', 'миндаль', 'кешью', 'арахис'],
+            'злаки': ['крупа', 'овсян', 'пшено', 'ячмень'],
+            'сладости': ['шоколад', 'конфет', 'батончик', 'мармелад'],
+            'кондитерка': ['торт', 'пирож', 'печенье', 'вафли', 'булочк'],
+            'напитки': ['вода', 'сок', 'кола', 'чай', 'кофе', 'лимонад', 'пиво', 'вино'],
+            'аптека': ['таблет', 'витамин', 'пластырь', 'лекарств', 'аспирин', 'бинт'],
+            'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи'],
             'хозтовары': ['порошок', 'губка', 'салфет', 'бумаг', 'пакет', 'средство', 'фейри', 'доместос']
         };
 
         const UNITS = ['шт', 'кг', 'г', 'л', 'мл', 'упак'];
-        const UNIT_MAP = { 'кг': 'кг', 'килограмм': 'кг', 'кило': 'кг', 'г': 'г', 'грамм': 'г', 'л': 'л', 'литр': 'л', 'мл': 'мл', 'шт': 'шт', 'упак': 'упак' };
-        const WORD_NUMBERS = { 'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5', 'полтора': '1.5' };
+        const UNIT_MAP = { 
+            'кг': 'кг', 'килограмм': 'кг', 'килограмма': 'кг', 'килограммов': 'кг', 'кило': 'кг', 
+            'г': 'г', 'грамм': 'г', 'л': 'л', 'литр': 'л', 'шт': 'шт', 'штук': 'шт', 'штуки': 'шт', 
+            'упак': 'упак', 'упаковка': 'упак', 'упаковки': 'упак', 'пачка': 'упак', 'пачку': 'упак' 
+        };
 
         function App() {
             const LOCATIONS = [{ id: 'магазин', label: 'Магазин', icon: '🛒' }, { id: 'рынок', label: 'Рынок', icon: '🧺' }, { id: 'онлайн', label: 'Онлайн', icon: '🚚' }];
+            const URGENCY = [{ id: 'normal', label: 'Несрочно', icon: '⏳' }, { id: 'urgent', label: 'Срочно', icon: '⚡' }];
 
             const [items, setItems] = useState({});
-            const [history, setHistory] = useState(() => {
-                try {
-                    const savedHist = localStorage.getItem('ss_v1100_history');
-                    return savedHist ? JSON.parse(savedHist) : [];
-                } catch (e) { return []; }
-            });
+            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_v1250_history')) || []);
             const [activeLoc, setActiveLoc] = useState('магазин');
             const [inputValue, setInputValue] = useState('');
             const [inputQty, setInputQty] = useState('1');
             const [inputUnit, setInputUnit] = useState('шт');
-            const [activePriority, setActivePriority] = useState('medium');
+            const [activeUrgency, setActiveUrgency] = useState('normal');
             const [view, setView] = useState('main'); 
             const [toast, setToast] = useState(null);
             const [editingItem, setEditingItem] = useState(null);
             const [isListening, setIsListening] = useState(false);
 
             useEffect(() => {
-                const hash = window.location.hash;
-                if (hash.startsWith('#shared=')) {
-                    try {
-                        const base64Data = hash.replace('#shared=', '');
-                        const jsonData = decodeURIComponent(escape(atob(base64Data)));
-                        const sharedItems = JSON.parse(jsonData);
-                        if (confirm('Загрузить присланный список?')) {
-                            setItems(sharedItems);
-                            window.location.hash = '';
-                            showToast("Список загружен!");
-                            return;
-                        }
-                    } catch (e) {}
-                }
-                const saved = localStorage.getItem('ss_v1100_items');
+                const saved = localStorage.getItem('ss_v1250_items');
                 if (saved) setItems(JSON.parse(saved));
             }, []);
 
             useEffect(() => {
-                localStorage.setItem('ss_v1100_items', JSON.stringify(items));
-            }, [items]);
-
-            useEffect(() => {
-                localStorage.setItem('ss_v1100_history', JSON.stringify(history));
-            }, [history]);
+                localStorage.setItem('ss_v1250_items', JSON.stringify(items));
+                localStorage.setItem('ss_v1250_history', JSON.stringify(history));
+            }, [items, history]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
             const parseVoiceInput = (text) => {
                 let lower = text.toLowerCase().trim();
                 let quantity = '1', unit = 'шт', name = text;
-                Object.keys(WORD_NUMBERS).forEach(word => { if (lower.includes(word)) { lower = lower.replace(word, WORD_NUMBERS[word]); } });
-                const match = lower.match(/(\d+(?:[.,]\d+)?)\s*([а-яё]+)?/);
-                if (match) {
-                    quantity = match[1].replace(',', '.');
-                    const word = match[2];
-                    if (word) {
-                        for (const [k, v] of Object.entries(UNIT_MAP)) {
-                            if (word.startsWith(k.substring(0, 2))) { unit = v; name = lower.replace(match[0], '').trim(); break; }
-                        }
-                    } else { name = lower.replace(match[1], '').trim(); }
+
+                if (lower.includes('полкилограмма') || lower.includes('полкило')) {
+                    quantity = '0.5'; unit = 'кг';
+                    name = lower.replace(/полкилограмма|полкило/g, '').trim();
+                } else {
+                    const match = lower.match(/(\d+(?:[.,]\d+)?)\s*([а-яё]+)?/);
+                    if (match) {
+                        quantity = match[1].replace(',', '.');
+                        const word = match[2];
+                        if (word) {
+                            for (const [k, v] of Object.entries(UNIT_MAP)) {
+                                if (word.startsWith(k.substring(0, 3))) { 
+                                    unit = v; 
+                                    name = lower.replace(match[0], '').trim(); 
+                                    break; 
+                                }
+                            }
+                        } else { name = lower.replace(match[1], '').trim(); }
+                    }
                 }
+                name = name.replace(/^(купи|добавь|возьми|надо|плиз|пожалуйста)\s+/i, '').trim();
                 return { name: name || text, quantity, unit };
             };
 
@@ -168,7 +181,7 @@
                 rec.onresult = (e) => { 
                     const p = parseVoiceInput(e.results[0][0].transcript);
                     setInputValue(p.name); setInputQty(p.quantity); setInputUnit(p.unit);
-                    showToast(`Определено: ${p.name}`); setIsListening(false); 
+                    setIsListening(false); 
                 };
                 rec.onerror = () => setIsListening(false);
                 rec.start();
@@ -179,59 +192,21 @@
                 const low = inputValue.toLowerCase();
                 let cat = 'другое';
                 for (const [id, kw] of Object.entries(DICTIONARY)) { if (kw.some(k => low.includes(k))) { cat = id; break; } }
-                const newItem = { id: Date.now(), text: inputValue.trim(), quantity: inputQty, unit: inputUnit, completed: false, category: cat, location: activeLoc };
+                const newItem = { id: Date.now(), text: inputValue.trim(), quantity: inputQty, unit: inputUnit, completed: false, category: cat, urgency: activeUrgency };
                 setItems(prev => ({...prev, [activeLoc]: [newItem, ...(prev[activeLoc] || [])]}));
-                setInputValue(''); setInputQty('1');
+                setInputValue(''); setInputQty('1'); setActiveUrgency('normal');
             };
 
             const toggleItem = (id) => {
                 const list = (items[activeLoc] || []).map(item => {
                     if (item.id === id) {
                         const isDone = !item.completed;
-                        if (isDone) {
-                            setHistory(prev => [{ ...item, completed: true, doneAt: new Date().toISOString() }, ...prev].slice(0, 200));
-                        }
+                        if (isDone) setHistory(prev => [{ ...item, completed: true, doneAt: new Date().toISOString() }, ...prev].slice(0, 200));
                         return {...item, completed: isDone};
                     }
                     return item;
                 });
                 setItems({...items, [activeLoc]: list});
-            };
-
-            const clearCurrentList = () => {
-                if (confirm('Очистить весь список в этой локации?')) {
-                    setItems(prev => ({...prev, [activeLoc]: []}));
-                    showToast("Список очищен");
-                }
-            };
-
-            const shareLink = () => {
-                const locItems = items[activeLoc] || [];
-                if (!locItems.length) return showToast("Список пуст");
-                try {
-                    const jsonData = JSON.stringify({ [activeLoc]: locItems });
-                    const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
-                    const baseUrl = window.location.href.split('#')[0];
-                    const sharedUrl = `${baseUrl}#shared=${base64Data}`;
-                    if (navigator.share) {
-                        navigator.share({ title: 'Список покупок', url: sharedUrl }).catch(() => copyLink(sharedUrl));
-                    } else { copyLink(sharedUrl); }
-                } catch (e) { showToast("Ошибка ссылки"); }
-            };
-
-            const copyLink = (url) => {
-                const el = document.createElement('textarea'); el.value = url; document.body.appendChild(el);
-                el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                showToast("Ссылка скопирована!");
-            };
-
-            const copyTextReport = () => {
-                const locItems = items[activeLoc] || [];
-                if (!locItems.length) return showToast("Список пуст");
-                const text = locItems.map(i => `${i.completed ? '✅' : '⬜'} ${i.text} (${i.quantity} ${i.unit})`).join('\n');
-                const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el);
-                el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                showToast("Текст списка скопирован!");
             };
 
             const groupedHistory = useMemo(() => {
@@ -254,21 +229,11 @@
                 <div className="min-h-screen flex justify-center items-start sm:p-4">
                     <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] sm:rounded-[45px] shadow-2xl flex flex-col relative overflow-hidden border border-white">
                         
-                        <header className="px-6 pt-8 pb-4 sticky top-0 bg-white/95 backdrop-blur-md z-40 border-b border-slate-50">
-                            <div className="flex justify-between items-center">
-                                <h1 className="text-2xl font-black tracking-tight text-[#1e293b]">Умные<span className="text-[#635BFF]">Покупки</span></h1>
-                                <button onClick={() => setView(view === 'main' ? 'history' : 'main')} className="p-3 bg-slate-50 rounded-2xl text-[#635BFF] active:scale-90 transition-all shadow-sm">
-                                    {view === 'main' ? <Icons.History /> : <Icons.Back />}
-                                </button>
-                            </div>
-                            {view === 'main' && (
-                                <div className="mt-4 flex items-center gap-3">
-                                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                        <div className="h-full bg-[#635BFF] transition-all duration-700" style={{width: `${stats.percent}%`}}></div>
-                                    </div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stats.done}/{stats.total} КУПЛЕНО</span>
-                                </div>
-                            )}
+                        <header className="px-6 pt-8 pb-4 sticky top-0 bg-white/95 backdrop-blur-md z-40 border-b border-slate-50 flex justify-between items-center">
+                            <h1 className="text-2xl font-black text-[#1e293b]">Умные<span className="text-[#635BFF]">Покупки</span></h1>
+                            <button onClick={() => setView(view === 'main' ? 'history' : 'main')} className="p-3 bg-slate-50 rounded-2xl text-[#635BFF] active:scale-90 transition-all shadow-sm">
+                                {view === 'main' ? <Icons.History /> : <Icons.Back />}
+                            </button>
                         </header>
 
                         {view === 'main' ? (
@@ -277,29 +242,32 @@
                                     <div className="flex-1 bg-slate-100 p-1 rounded-2xl flex gap-1 shadow-inner">
                                         {LOCATIONS.map(loc => (
                                             <button key={loc.id} onClick={() => setActiveLoc(loc.id)} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold transition-all ${activeLoc === loc.id ? 'bg-white text-[#635BFF] shadow-sm' : 'text-slate-400'}`}>
-                                                <span className="text-lg">{loc.icon}</span> {loc.label}
+                                                {loc.label}
                                             </button>
                                         ))}
                                     </div>
-                                    <button onClick={clearCurrentList} className="p-3 bg-red-50 text-red-400 rounded-2xl border border-red-100 active:scale-90 transition-all">
-                                        <Icons.Trash />
-                                    </button>
+                                    <button onClick={() => confirm('Очистить список?') && setItems({...items, [activeLoc]: []})} className="p-3 bg-red-50 text-red-400 rounded-2xl active:scale-90 border border-red-100"><Icons.Trash /></button>
                                 </div>
 
                                 <div className="px-6 mb-4 sticky top-[135px] z-30">
                                     <div className="bg-white rounded-3xl shadow-[0_15px_40px_rgba(99,91,255,0.12)] border border-indigo-50 p-5 space-y-4">
                                         <div className="flex gap-3">
-                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-[#635BFF]/10 outline-none transition-all" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
+                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg text-slate-700 outline-none" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
                                             <button onClick={addItem} className="bg-[#635BFF] text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl active:scale-90"><Icons.Plus /></button>
                                         </div>
-                                        <div className="flex gap-3">
+                                        <div className="flex gap-3 items-center">
                                             <div className="flex-[2] flex bg-slate-50 rounded-2xl items-center px-4 py-3">
                                                 <input type="number" step="any" className="w-full bg-transparent font-black text-[#635BFF] text-lg outline-none" value={inputQty} onChange={(e) => setInputQty(e.target.value)} />
                                                 <select className="bg-transparent font-black text-slate-400 text-xs appearance-none ml-2 outline-none" value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select>
                                             </div>
-                                            <button onClick={startVoice} className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-indigo-50 text-[#635BFF]'}`}>
-                                                <Icons.Mic />
-                                            </button>
+                                            <div className="flex-1 flex gap-1">
+                                                {URGENCY.map(u => (
+                                                    <button key={u.id} onClick={() => setActiveUrgency(u.id)} className={`flex-1 h-12 rounded-xl text-lg flex items-center justify-center transition-all ${activeUrgency === u.id ? 'bg-indigo-50 border-2 border-[#635BFF]/30' : 'bg-slate-50 border-2 border-transparent'}`}>
+                                                        {u.icon}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <button onClick={startVoice} className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-slate-50 text-[#635BFF]'}`}><Icons.Mic /></button>
                                         </div>
                                     </div>
                                 </div>
@@ -310,21 +278,32 @@
                                     ) : (
                                         <div className="space-y-8">
                                             {CATEGORIES.filter(c => (items[activeLoc] || []).some(i => i.category === c.id)).map(cat => {
-                                                const catItems = items[activeLoc].filter(i => i.category === cat.id).sort((a, b) => a.completed - b.completed);
+                                                // Умная сортировка: сначала невыполненные (срочные выше), потом выполненные
+                                                const catItems = [...(items[activeLoc] || [])]
+                                                    .filter(i => i.category === cat.id)
+                                                    .sort((a, b) => {
+                                                        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                                                        if (a.urgency === 'urgent' && b.urgency !== 'urgent') return -1;
+                                                        if (a.urgency !== 'urgent' && b.urgency === 'urgent') return 1;
+                                                        return b.id - a.id;
+                                                    });
+
                                                 return (
                                                     <div key={cat.id} className="animate-pop">
                                                         <div className="flex items-center gap-3 mb-2 px-1">
                                                             <span className={`text-sm font-black uppercase tracking-widest ${cat.color}`}>{cat.icon} {cat.label}</span>
                                                             <div className="h-[1px] flex-1 bg-slate-100"></div>
                                                         </div>
-                                                        <div className="space-y-1">
+                                                        <div className="flex flex-col gap-1.5">
                                                             {catItems.map(item => (
-                                                                <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
+                                                                <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40 order-last' : 'bg-white shadow-sm border-slate-100'}`}>
                                                                     <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
                                                                         {item.completed && <Icons.Check />}
                                                                     </div>
                                                                     <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
-                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
+                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                                                                            {item.urgency === 'urgent' && !item.completed && '⚡ '}{item.text}
+                                                                        </span>
                                                                         <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
                                                                     </div>
                                                                     <div className="flex gap-1 shrink-0">
@@ -341,39 +320,44 @@
                                     )}
                                 </main>
 
-                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-40 flex items-center gap-3">
-                                    <button onClick={shareLink} className="flex-[2] h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
-                                        <Icons.Link /> ССЫЛКА
-                                    </button>
-                                    <button onClick={copyTextReport} className="flex-1 h-16 bg-white border-2 border-slate-100 text-slate-500 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-all">
-                                        <Icons.Copy /> ТЕКСТ
-                                    </button>
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-40 flex gap-3">
+                                    <button onClick={() => {
+                                        const locItems = items[activeLoc] || [];
+                                        if (!locItems.length) return showToast("Список пуст");
+                                        const jsonData = JSON.stringify({ [activeLoc]: locItems });
+                                        const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
+                                        const sharedUrl = `${window.location.href.split('#')[0]}#shared=${base64Data}`;
+                                        if (navigator.share) navigator.share({ title: 'Список покупок', url: sharedUrl }).catch(() => {
+                                            const el = document.createElement('textarea'); el.value = sharedUrl; document.body.appendChild(el);
+                                            el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast("Ссылка скопирована!");
+                                        });
+                                    }} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all"><Icons.Link /> ССЫЛКА</button>
+                                    <button onClick={() => {
+                                        const locItems = items[activeLoc] || [];
+                                        if (!locItems.length) return showToast("Список пуст");
+                                        const text = locItems.map(i => `${i.completed ? '✅' : '⬜'} ${i.text} (${i.quantity} ${i.unit})`).join('\n');
+                                        const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el);
+                                        el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast("Текст скопирован!");
+                                    }} className="flex-1 h-16 bg-white border-2 border-slate-100 text-slate-500 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-xl active:scale-95 transition-all"><Icons.Copy /> ТЕКСТ</button>
                                 </div>
                             </>
                         ) : (
                             <main className="flex-1 px-6 overflow-y-auto pb-10 pt-4 no-scrollbar">
-                                {history.length === 0 ? (
-                                    <div className="py-20 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase text-slate-400">История пуста</p></div>
-                                ) : (
+                                {history.length === 0 ? <div className="py-20 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase">История пуста</p></div> : (
                                     <div className="space-y-8 pb-24">
-                                        {Object.entries(groupedHistory).map(([date, historyItems]) => (
-                                            <div key={date} className="animate-pop">
-                                                <div className="flex items-center gap-3 mb-4 px-2">
-                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{date}</span>
-                                                    <div className="h-[1px] flex-1 bg-slate-100"></div>
-                                                </div>
+                                        {Object.entries(groupedHistory).map(([date, hist]) => (
+                                            <div key={date}>
+                                                <div className="flex items-center gap-3 mb-4 px-2"><span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">{date}</span><div className="h-[1px] flex-1 bg-slate-100"></div></div>
                                                 <div className="space-y-1.5">
-                                                    {historyItems.map((h, i) => (
-                                                        <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm">
-                                                            <div className="flex-1 font-bold text-base text-slate-800 truncate">
-                                                                {h.text} <span className="text-sm font-black text-indigo-400 uppercase ml-2">— {h.quantity} {h.unit}</span>
-                                                            </div>
+                                                    {hist.map((h, i) => (
+                                                        <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 font-bold text-base text-slate-800">
+                                                            {h.text} <span className="text-sm font-black text-indigo-400 uppercase ml-2">— {h.quantity} {h.unit}</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </div>
                                         ))}
-                                        <button onClick={() => { if(confirm('Очистить всю историю?')) setHistory([]); }} className="w-full py-4 text-xs font-black uppercase text-slate-300 hover:text-red-400 transition-colors">Удалить историю</button>
+                                        <button onClick={() => confirm('Очистить историю?') && setHistory([])} className="w-full py-4 text-xs font-black uppercase text-slate-300 hover:text-red-400">Удалить историю</button>
                                     </div>
                                 )}
                             </main>
@@ -382,22 +366,36 @@
                         {editingItem && (
                             <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-6">
                                 <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-pop border border-white">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-lg font-black text-slate-800">Правка</h2><button onClick={() => setEditingItem(null)} className="p-2 bg-slate-50 rounded-xl text-slate-400"><Icons.X /></button>
-                                    </div>
-                                    <div className="space-y-5">
-                                        <input type="text" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none focus:ring-2 focus:ring-[#635BFF]/10" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} />
-                                        <div className="relative">
-                                            <select className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-slate-700 text-base border border-slate-100 appearance-none cursor-pointer outline-none" value={editingItem.category} onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}>
-                                                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
-                                            </select>
-                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-30"><Icons.ChevronDown /></div>
+                                    <div className="flex justify-between items-center mb-6"><h2 className="text-lg font-black text-slate-800">Правка</h2><button onClick={() => setEditingItem(null)} className="p-2 bg-slate-50 rounded-xl text-slate-400"><Icons.X /></button></div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Название</label>
+                                            <input type="text" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} />
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Кол-во</label>
+                                                <input type="number" step="any" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none" value={editingItem.quantity} onChange={(e) => setEditingItem({...editingItem, quantity: e.target.value})} />
+                                            </div>
+                                            <div className="flex-1 space-y-1">
+                                                <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Ед. изм.</label>
+                                                <select className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-slate-700 border border-slate-100 outline-none h-[60px]" value={editingItem.unit} onChange={(e) => setEditingItem({...editingItem, unit: e.target.value})}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase ml-2">Категория</label>
+                                            <select className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-slate-700 border border-slate-100 outline-none" value={editingItem.category} onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}>{CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}</select>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            {URGENCY.map(u => (
+                                                <button key={u.id} onClick={() => setEditingItem({...editingItem, urgency: u.id})} className={`flex-1 py-3 rounded-xl font-bold text-xs transition-all ${editingItem.urgency === u.id ? 'bg-[#635BFF] text-white' : 'bg-slate-50 text-slate-400'}`}>{u.icon} {u.label}</button>
+                                            ))}
                                         </div>
                                         <button onClick={() => { 
                                             const ns = {...items}; 
-                                            ns[activeLoc] = ns[activeLoc].map(i => i.id === editingItem.id ? editingItem : i);
+                                            ns[activeLoc] = (ns[activeLoc] || []).map(i => i.id === editingItem.id ? editingItem : i);
                                             setItems(ns); setEditingItem(null); showToast('Сохранено'); 
-                                        }} className="w-full bg-[#635BFF] py-5 rounded-3xl text-white font-black uppercase text-sm shadow-lg active:scale-95 transition-all mt-4 tracking-widest text-center shadow-indigo-100">Сохранить</button>
+                                        }} className="w-full bg-[#635BFF] py-5 rounded-3xl text-white font-black uppercase text-sm shadow-lg active:scale-95 transition-all mt-2">Сохранить</button>
                                     </div>
                                 </div>
                             </div>
