@@ -65,7 +65,8 @@
             Back: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
             ChevronDown: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
             Link: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>,
-            Copy: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>,
+            Trash: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         };
 
         const DICTIONARY = {
@@ -90,7 +91,7 @@
         ];
 
         const UNITS = ['шт', 'кг', 'г', 'л', 'мл', 'упак'];
-        const UNIT_MAP = { 'кг': 'кг', 'килограмм': 'кг', 'кило': 'кг', 'г': 'г', 'грамм': 'г', 'л': 'л', 'литр': 'л', 'шт': 'шт', 'упак': 'упак' };
+        const UNIT_MAP = { 'кг': 'кг', 'килограмм': 'кг', 'кило': 'кг', 'г': 'г', 'грамм': 'г', 'л': 'л', 'литр': 'л', 'мл': 'мл', 'шт': 'шт', 'упак': 'упак' };
         const WORD_NUMBERS = { 'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5', 'полтора': '1.5' };
 
         function App() {
@@ -98,6 +99,12 @@
             const LOCATIONS = [{ id: 'магазин', label: 'Магазин', icon: '🛒' }, { id: 'рынок', label: 'Рынок', icon: '🧺' }, { id: 'онлайн', label: 'Онлайн', icon: '🚚' }];
 
             const [items, setItems] = useState({});
+            const [history, setHistory] = useState(() => {
+                try {
+                    const savedHist = localStorage.getItem('ss_v900_history');
+                    return savedHist ? JSON.parse(savedHist) : [];
+                } catch (e) { return []; }
+            });
             const [activeLoc, setActiveLoc] = useState('магазин');
             const [inputValue, setInputValue] = useState('');
             const [inputQty, setInputQty] = useState('1');
@@ -110,7 +117,6 @@
 
             // ЗАГРУЗКА ПРИ СТАРТЕ
             useEffect(() => {
-                // 1. Проверяем, не перешли ли мы по "расшаренной" ссылке
                 const hash = window.location.hash;
                 if (hash.startsWith('#shared=')) {
                     try {
@@ -120,14 +126,13 @@
                         
                         if (confirm('Вам прислали список покупок. Загрузить его?')) {
                             setItems(sharedItems);
-                            window.location.hash = ''; // Очищаем адрес
+                            window.location.hash = '';
                             showToast("Список загружен!");
                             return;
                         }
                     } catch (e) { console.error("Link error", e); }
                 }
 
-                // 2. Иначе грузим из локальной памяти
                 try {
                     const saved = localStorage.getItem('ss_v900_items');
                     if (saved) setItems(JSON.parse(saved));
@@ -140,6 +145,10 @@
                     localStorage.setItem('ss_v900_items', JSON.stringify(items));
                 }
             }, [items]);
+
+            useEffect(() => {
+                localStorage.setItem('ss_v900_history', JSON.stringify(history));
+            }, [history]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -185,35 +194,44 @@
             };
 
             const toggleItem = (id) => {
-                const list = (items[activeLoc] || []).map(item => item.id === id ? {...item, completed: !item.completed} : item);
+                const list = (items[activeLoc] || []).map(item => {
+                    if (item.id === id) {
+                        const isDone = !item.completed;
+                        if (isDone) {
+                            // Добавляем в историю
+                            const historyItem = { ...item, completed: true, doneAt: new Date().toISOString() };
+                            setHistory(prev => [historyItem, ...prev].slice(0, 100));
+                        }
+                        return {...item, completed: isDone};
+                    }
+                    return item;
+                });
                 setItems({...items, [activeLoc]: list});
             };
 
-            // НОВЫЙ СПОСОБ: ПОДЕЛИТЬСЯ ССЫЛКОЙ
+            const clearAll = () => {
+                if (confirm('Очистить весь список в этой локации?')) {
+                    setItems(prev => ({...prev, [activeLoc]: []}));
+                    showToast("Список очищен");
+                }
+            };
+
             const shareLink = () => {
                 const locItems = items[activeLoc] || [];
                 if (!locItems.length) return showToast("Список пуст");
                 
                 try {
-                    // Кодируем данные в Base64
                     const jsonData = JSON.stringify({ [activeLoc]: locItems });
                     const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
-                    
-                    // Создаем чистую ссылку без текущих хэшей
                     const baseUrl = window.location.href.split('#')[0];
                     const sharedUrl = `${baseUrl}#shared=${base64Data}`;
                     
                     if (navigator.share) {
-                        navigator.share({
-                            title: 'Мой список покупок',
-                            url: sharedUrl
-                        }).catch(() => copyToClipboard(sharedUrl));
+                        navigator.share({ title: 'Мой список покупок', url: sharedUrl }).catch(() => copyToClipboard(sharedUrl));
                     } else {
                         copyToClipboard(sharedUrl);
                     }
-                } catch (e) {
-                    showToast("Ошибка создания ссылки");
-                }
+                } catch (e) { showToast("Ошибка создания ссылки"); }
             };
 
             const copyToClipboard = (text) => {
@@ -223,7 +241,7 @@
                 el.select();
                 document.execCommand('copy');
                 document.body.removeChild(el);
-                showToast("Ссылка скопирована! Отправьте её в чат.");
+                showToast("Ссылка скопирована!");
             };
 
             const copyTextReport = () => {
@@ -239,6 +257,8 @@
                 const done = list.filter(i => i.completed).length;
                 return { done, total: list.length, percent: list.length ? Math.round((done / list.length) * 100) : 0 };
             }, [items, activeLoc]);
+
+            const allDone = stats.total > 0 && stats.done === stats.total;
 
             return (
                 <div className="min-h-screen flex justify-center items-start sm:p-4">
@@ -272,6 +292,14 @@
                                         ))}
                                     </div>
                                 </div>
+
+                                {allDone && (
+                                    <div className="px-6 mb-4 animate-pop">
+                                        <button onClick={clearAll} className="w-full py-3 bg-red-50 text-red-500 rounded-2xl font-bold text-xs uppercase tracking-widest border border-red-100 flex items-center justify-center gap-2">
+                                            <Icons.Trash /> Очистить список
+                                        </button>
+                                    </div>
+                                )}
 
                                 <div className="px-6 mb-4 sticky top-[135px] z-30">
                                     <div className="bg-white rounded-3xl shadow-[0_15px_40px_rgba(99,91,255,0.12)] border border-indigo-50 p-5 space-y-4">
@@ -311,7 +339,7 @@
                                                                         {item.completed && <Icons.Check />}
                                                                     </div>
                                                                     <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
-                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
+                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-800' : 'text-slate-800'}`}>{item.text}</span>
                                                                         <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
                                                                     </div>
                                                                     <div className="flex gap-1 shrink-0">
@@ -339,7 +367,25 @@
                             </>
                         ) : (
                             <main className="flex-1 px-6 overflow-y-auto pb-10 pt-4 no-scrollbar">
-                                <div className="py-20 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase text-slate-400">История будет здесь</p></div>
+                                {history.length === 0 ? (
+                                    <div className="py-20 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase text-slate-400">История пуста</p></div>
+                                ) : (
+                                    <div className="space-y-4 pb-24">
+                                        {history.map((h, i) => (
+                                            <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center animate-pop shadow-sm">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="font-bold text-base text-slate-800 leading-tight">{h.text}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-black text-indigo-400 uppercase">{new Date(h.doneAt).toLocaleDateString()} в {new Date(h.doneAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                        <span className="text-[10px] font-black text-slate-300 uppercase">{h.quantity} {h.unit}</span>
+                                                    </div>
+                                                </div>
+                                                <span className="text-xl opacity-40">{CATEGORIES.find(c => c.id === h.category)?.icon || '📦'}</span>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => { if(confirm('Очистить всю историю?')) setHistory([]); }} className="w-full py-4 text-xs font-black uppercase text-slate-300 hover:text-red-400 transition-colors">Очистить историю</button>
+                                    </div>
+                                )}
                             </main>
                         )}
 
