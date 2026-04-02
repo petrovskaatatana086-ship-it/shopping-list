@@ -8,8 +8,6 @@
     <meta name="theme-color" content="#635BFF">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3737/3737372.png">
     
-    <link rel="manifest" href='data:application/json,{"name":"Smart Shopping Pro","short_name":"Shopping","start_url":".","display":"standalone","background_color":"#635BFF","theme_color":"#635BFF","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3737/3737372.png","sizes":"512x512","type":"image/png"}]}'>
-
     <title>Умные Покупки Pro</title>
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -18,12 +16,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Manrope', 'sans-serif'] } } } }
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Manrope', 'sans-serif'] },
+                } 
+            } 
+        }
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
-        body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            overscroll-behavior-y: contain; 
+            background-color: #f8fafc;
+            font-family: 'Manrope', sans-serif;
+            font-size: 16px; 
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         input, button, select { outline: none !important; }
@@ -36,143 +46,162 @@
         select { -webkit-appearance: none; appearance: none; }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-800 antialiased">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
 
         const Icons = {
-            Plus: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
-            Mic: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>,
-            Brush: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.21 0 4-1.79 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path></svg>,
-            Check: () => <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
-            Delete: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>,
-            Back: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-            X: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
-            ChevronDown: () => <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
-            Share: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            Plus: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+            Mic: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>,
+            Brush: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"></path><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.21 0 4-1.79 4-4.04a3.01 3.01 0 0 0-3-3.02z"></path></svg>,
+            Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+            X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            History: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>,
+            Back: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+            ChevronDown: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+            Send: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         };
 
+        // Словарь для автоматического определения категорий
         const DICTIONARY = {
-            'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш'],
-            'птица': ['куриц', 'кура', 'индеик', 'утк', 'гусь', 'крылышк', 'филе'],
-            'рыба': ['рыб', 'кревет', 'кальмар', 'миди', 'икр', 'лосось', 'сибас'],
-            'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк'],
-            'яйца': ['яиц', 'яйц'],
-            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач'],
-            'зелень': ['салат', 'кинз', 'укроп', 'петрушк', 'зелен'],
-            'фрукты': ['яблок', 'цитрус', 'апелсин', 'лимон', 'клубник', 'черник', 'банан', 'черен', 'вишн', 'персик', 'груш', 'манго'],
-            'крупы': ['пшениц', 'рис', 'гречк', 'овсян', 'киноа', 'фасол', 'чечевиц', 'нут', 'горох', 'соя'],
-            'орехи': ['миндал', 'грецк', 'орех', 'семеч', 'подсолнеч', 'чиа', 'лен'],
-            'бакалея': ['хлеб', 'батон', 'масло'],
-            'мука': ['мука', 'дрожж', 'разрыхл'],
-            'специи': ['сол', 'сахар', 'перец', 'трав', 'уксус'],
-            'соусы': ['майонез', 'кетчуп', 'соев', 'горчиц'],
-            'напитки': ['вода', 'сок', 'чай', 'кофе', 'газиров', 'лимонад'],
-            'алкоголь': ['вино', 'пиво', 'водк', 'виски'],
-            'заморозка': ['пелмен', 'заморож', 'пицц'],
-            'консервы': ['консерв', 'шпрот', 'тушенк'],
-            'сладкое': ['шоколад', 'конфет', 'печен', 'торт'],
-            'колбасы': ['колбас', 'сосиск', 'ветчин']
+            'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш', 'куриц', 'кура', 'индеик', 'утк', 'гусь', 'филе', 'рыб', 'кревет', 'лосось'],
+            'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк', 'яйц'],
+            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач', 'яблок', 'цитрус', 'апелсин', 'лимон', 'клубник', 'черник', 'банан', 'черен', 'вишн', 'персик', 'груш'],
+            'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'гречк', 'рис', 'крупа', 'масло', 'кетчуп', 'майонез'],
+            'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи', 'дезодор', 'ватн'],
+            'хозтовары': ['порошок', 'губка', 'салфет', 'бумаг', 'пакет', 'средство', 'фейри', 'доместос']
         };
+
+        const CATEGORIES = [
+            { id: 'овощи', label: 'Овощи/Фрукты', icon: '🥦', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+            { id: 'мясо', label: 'Мясо/Рыба', icon: '🥩', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
+            { id: 'молочка', label: 'Молочное', icon: '🥛', color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
+            { id: 'бакалея', label: 'Бакалея', icon: '🍞', color: 'text-stone-600', bg: 'bg-stone-50', border: 'border-stone-100' },
+            { id: 'соусы', label: 'Соусы', icon: '🧴', color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-100' },
+            { id: 'красота', label: 'Красота и уход', icon: '🧼', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
+            { id: 'хозтовары', label: 'Хоз.товары', icon: '🏠', color: 'text-cyan-700', bg: 'bg-cyan-50', border: 'border-cyan-100' },
+            { id: 'другое', label: 'Другое', icon: '📦', color: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-100' },
+        ];
 
         const UNITS = ['шт', 'кг', 'г', 'л', 'мл', 'упак'];
 
+        // Расширенный словарь соответствий единиц
+        const UNIT_MAP = {
+            'кг': 'кг', 'килограмм': 'кг', 'килограмма': 'кг', 'килограммов': 'кг', 'кило': 'кг',
+            'г': 'г', 'грамм': 'г', 'грамма': 'г', 'граммов': 'г',
+            'л': 'л', 'литр': 'л', 'литра': 'л', 'литров': 'л',
+            'мл': 'мл', 'миллилитр': 'мл', 'миллилитра': 'мл', 'миллилитров': 'мл',
+            'шт': 'шт', 'штука': 'шт', 'штуки': 'шт', 'штук': 'шт',
+            'упак': 'упак', 'упаковка': 'упак', 'упаковки': 'упак', 'упаковок': 'упак'
+        };
+
+        const WORD_NUMBERS = {
+            'один': '1', 'одна': '1', 'два': '2', 'две': '2', 'три': '3', 'четыре': '4', 'пять': '5', 'полтора': '1.5', 'половина': '0.5'
+        };
+
         function App() {
-            const PRIORITIES = useMemo(() => [
-                { id: 'low', label: 'Не к спеху', icon: '🕒', color: 'text-slate-400 bg-slate-100' },
-                { id: 'medium', label: 'Обычный', icon: '➖', color: 'text-[#635BFF] bg-indigo-50' },
-                { id: 'high', label: 'Срочно', icon: '⚡', color: 'text-red-500 bg-red-50' }
-            ], []);
+            const PRIORITIES = [{ id: 'low', icon: '🕒', color: 'text-slate-400 bg-slate-50' }, { id: 'medium', icon: '➖', color: 'text-[#635BFF] bg-indigo-50' }, { id: 'high', icon: '⚡', color: 'text-red-500 bg-red-50' }];
+            const LOCATIONS = [{ id: 'магазин', label: 'Магазин', icon: '🛒' }, { id: 'рынок', label: 'Рынок', icon: '🧺' }, { id: 'онлайн', label: 'Онлайн', icon: '🚚' }];
 
-            const CATEGORIES = useMemo(() => [
-                { id: 'овощи', label: 'Овощи', icon: '🥦', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-                { id: 'фрукты', label: 'Фрукты', icon: '🍎', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
-                { id: 'зелень', label: 'Зелень', icon: '🌿', color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
-                { id: 'мясо', label: 'Мясо', icon: '🥩', color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
-                { id: 'птица', label: 'Птица', icon: '🍗', color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100' },
-                { id: 'рыба', label: 'Рыба/Море', icon: '🐟', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-                { id: 'молочка', label: 'Молочка', icon: '🥛', color: 'text-sky-600', bg: 'bg-sky-50', border: 'border-sky-100' },
-                { id: 'бакалея', label: 'Бакалея', icon: '🍞', color: 'text-stone-600', bg: 'bg-stone-50', border: 'border-stone-100' },
-                { id: 'крупы', label: 'Крупы', icon: '🌾', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-100' },
-                { id: 'сладкое', label: 'Сладости', icon: '🍰', color: 'text-pink-600', bg: 'bg-pink-50', border: 'border-pink-100' },
-                { id: 'напитки', label: 'Напитки', icon: '🥤', color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' },
-                { id: 'аптека', label: 'Аптека', icon: '💊', color: 'text-emerald-500', bg: 'bg-emerald-100', border: 'border-emerald-100' },
-            ], []);
-
-            const LOCATIONS = [
-                { id: 'магазин', label: 'Магазин', icon: '🛒' },
-                { id: 'рынок', label: 'Рынок', icon: '🧺' },
-                { id: 'онлайн', label: 'Онлайн', icon: '🚚' },
-            ];
-
-            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_v35_items')) || {});
-            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_v35_hist')) || []);
+            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_v100_items')) || {});
+            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_v100_hist')) || []);
             const [activeLoc, setActiveLoc] = useState('магазин');
-            const [activeCat, setActiveCat] = useState('овощи');
-            const [isManualCat, setIsManualCat] = useState(false);
-            const [activePriority, setActivePriority] = useState('medium');
             const [inputValue, setInputValue] = useState('');
             const [inputQty, setInputQty] = useState('1');
             const [inputUnit, setInputUnit] = useState('шт');
+            const [activePriority, setActivePriority] = useState('medium');
             const [view, setView] = useState('main'); 
             const [toast, setToast] = useState(null);
             const [editingItem, setEditingItem] = useState(null);
             const [isListening, setIsListening] = useState(false);
 
             useEffect(() => {
-                localStorage.setItem('ss_v35_items', JSON.stringify(items));
-                localStorage.setItem('ss_v35_hist', JSON.stringify(history));
+                localStorage.setItem('ss_v100_items', JSON.stringify(items));
+                localStorage.setItem('ss_v100_hist', JSON.stringify(history));
             }, [items, history]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
 
+            // УЛУЧШЕННЫЙ ПАРСЕР ГОЛОСА
             const parseVoiceInput = (text) => {
-                const lower = text.toLowerCase().trim();
-                let quantity = '1', unit = 'шт', name = text;
-                const match = lower.match(/(\d+(?:[.,]\d+)?)\s*(кг|г|шт|л|мл|упак|штуки|штук|килограмм|грамм|литр)/);
+                let lower = text.toLowerCase().trim();
+                let quantity = '1';
+                let unit = 'шт';
+                let name = text;
+
+                // 1. Заменяем слова-числа на цифры
+                Object.keys(WORD_NUMBERS).forEach(word => {
+                    if (lower.includes(word)) {
+                        lower = lower.replace(word, WORD_NUMBERS[word]);
+                    }
+                });
+
+                // 2. Ищем конструкцию: [Число] [Единица измерения]
+                const match = lower.match(/(\d+(?:[.,]\d+)?)\s*([а-яё]+)?/);
+                
                 if (match) {
                     quantity = match[1].replace(',', '.');
-                    const u = match[2];
-                    if (u.includes('кг') || u.includes('кило')) unit = 'кг';
-                    else if (u.includes('г') && !u.includes('гр')) unit = 'г';
-                    else if (u.includes('шт')) unit = 'шт';
-                    else if (u.includes('л')) unit = 'л';
-                    name = lower.replace(match[0], '').trim();
+                    const wordAfterNum = match[2];
+                    
+                    if (wordAfterNum) {
+                        // Проверяем, есть ли такое слово в нашем словаре единиц
+                        for (const [key, val] of Object.entries(UNIT_MAP)) {
+                            if (wordAfterNum.startsWith(key.substring(0, 3))) {
+                                unit = val;
+                                // Если нашли единицу, убираем всё это из названия
+                                name = lower.replace(match[0], '').trim();
+                                break;
+                            }
+                        }
+                    } else {
+                        // Если только число, просто убираем число
+                        name = lower.replace(match[1], '').trim();
+                    }
                 }
+
+                // Убираем лишние слова типа "купи", "возьми", "пожалуйста"
+                name = name.replace(/^(купи|возьми|надо|добавь|плиз|пожалуйста)\s+/i, '').trim();
+
                 return { name: name || text, quantity, unit };
             };
 
             const startVoice = () => {
                 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SR) return showToast("Голос не поддерживается");
-                const rec = new SR(); rec.lang = 'ru-RU';
+                if (!SR) return showToast("Голос не поддерживается вашим браузером");
+                
+                const rec = new SR();
+                rec.lang = 'ru-RU';
                 rec.onstart = () => setIsListening(true);
+                
                 rec.onresult = (e) => { 
-                    const p = parseVoiceInput(e.results[0][0].transcript);
-                    setInputValue(p.name); setInputQty(p.quantity); setInputUnit(p.unit);
-                    if (!isManualCat) detectCategory(p.name);
+                    const transcript = e.results[0][0].transcript;
+                    const parsed = parseVoiceInput(transcript);
+                    
+                    setInputValue(parsed.name);
+                    setInputQty(parsed.quantity);
+                    setInputUnit(parsed.unit);
+                    
+                    showToast(`Распознано: ${parsed.name}`);
                     setIsListening(false); 
                 };
+                
                 rec.onerror = () => setIsListening(false);
+                rec.onend = () => setIsListening(false);
                 rec.start();
-            };
-
-            const detectCategory = (val) => {
-                if (isManualCat || val.length < 2) return;
-                const low = val.toLowerCase();
-                for (const [id, kw] of Object.entries(DICTIONARY)) {
-                    if (kw.some(k => low.includes(k))) { setActiveCat(id); break; }
-                }
             };
 
             const addItem = () => {
                 if (!inputValue.trim()) return;
-                const newItem = { id: Date.now(), text: inputValue.trim(), quantity: inputQty, unit: inputUnit, priority: activePriority, completed: false, category: activeCat, location: activeLoc };
+                const low = inputValue.toLowerCase();
+                let cat = 'другое';
+                for (const [id, kw] of Object.entries(DICTIONARY)) { 
+                    if (kw.some(k => low.includes(k))) { cat = id; break; } 
+                }
+                const newItem = { id: Date.now(), text: inputValue.trim(), quantity: inputQty, unit: inputUnit, priority: activePriority, completed: false, category: cat, location: activeLoc };
                 setItems(prev => ({...prev, [activeLoc]: [newItem, ...(prev[activeLoc] || [])]}));
-                setInputValue(''); setInputQty('1'); setActivePriority('medium'); setIsManualCat(false);
-                showToast(`Добавлено!`);
+                setInputValue(''); setInputQty('1'); setActivePriority('medium');
             };
 
             const toggleItem = (id) => {
@@ -187,166 +216,166 @@
                 setItems({...items, [activeLoc]: list});
             };
 
-            // ФУНКЦИЯ ЭКСПОРТА СПЕЦИАЛЬНО ДЛЯ ЗАМЕТОК IPHONE С ЧЕКБОКСАМИ
-            const shareToNotes = async () => {
+            const sendInteractiveFile = async () => {
                 const locItems = items[activeLoc] || [];
                 if (!locItems.length) return showToast("Список пуст");
-                
-                // Используем формат Markdown (- [ ]), который iPhone понимает как список
-                let text = `СПИСОК ПОКУПОК: ${activeLoc.toUpperCase()}\n\n`;
-                
-                const toBuy = locItems.filter(i => !i.completed);
-                const done = locItems.filter(i => i.completed);
 
-                if (toBuy.length > 0) {
-                    text += `НУЖНО КУПИТЬ:\n`;
-                    const grouped = {};
-                    toBuy.forEach(i => { if (!grouped[i.category]) grouped[i.category] = []; grouped[i.category].push(i); });
-                    
-                    CATEGORIES.forEach(cat => {
-                        if (grouped[cat.id]) {
-                            text += `\n# ${cat.label.toUpperCase()}\n`;
-                            grouped[cat.id].forEach(i => {
-                                // Этот формат iPhone часто превращает в кружочки сам
-                                text += `- [ ] ${i.text} — ${i.quantity} ${i.unit}\n`;
-                            });
-                        }
-                    });
+                const itemsJson = JSON.stringify(locItems);
+                const fileContent = `
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список: ${activeLoc.toUpperCase()}</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        h1 { font-size: 24px; color: #635bff; margin-bottom: 20px; text-align: center; font-weight: 900; }
+        .item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .item.done { opacity: 0.4; }
+        .checkbox { width: 28px; height: 28px; border: 2px solid #cbd5e1; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+        .done .checkbox { background: #10b981; border-color: #10b981; color: white; }
+        .done .checkbox::after { content: '✔'; font-weight: bold; }
+        .text { font-size: 18px; font-weight: 600; flex: 1; }
+        .qty { color: #635bff; font-weight: 800; font-size: 14px; margin-left: 10px; border-left: 2px solid #eee; padding-left: 10px; }
+        .done .text { text-decoration: line-through; }
+        .btn { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-save { background: #635bff; color: white; box-shadow: 0 4px 14px rgba(99,91,255,0.4); }
+        .btn-reset { background: #f1f5f9; color: #64748b; margin-top: 10px; }
+        .btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🛒 Список покупок</h1>
+        <div id="list"></div>
+        <button class="btn btn-save" onclick="save()">💾 Скачать версию с отметками</button>
+        <button class="btn btn-reset" onclick="reset()">🔄 Сбросить все отметки</button>
+    </div>
+    <script>
+        let data = ${itemsJson};
+        function render() {
+            const c = document.getElementById('list'); c.innerHTML = '';
+            data.forEach((i, idx) => {
+                const d = document.createElement('div'); d.className = 'item' + (i.completed ? ' done' : '');
+                d.onclick = () => { data[idx].completed = !data[idx].completed; render(); };
+                d.innerHTML = '<div class="checkbox"></div><div class="text">' + i.text + '<span class="qty">' + i.quantity + ' ' + i.unit + '</span></div>';
+                c.appendChild(d);
+            });
+        }
+        function reset() { data.forEach(i => i.completed = false); render(); }
+        function save() {
+            const h = document.documentElement.outerHTML.replace(/let data = .*;/, 'let data = ' + JSON.stringify(data) + ';');
+            const b = new Blob([h], {type: 'text/html'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'spisok-s-otmetkami.html'; a.click();
+        }
+        render();
+    <\/script>
+</body>
+</html>`;
+                const blob = new Blob([fileContent], { type: 'text/html' });
+                const file = new File([blob], `spisok-${activeLoc}.html`, { type: 'text/html' });
+
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try { await navigator.share({ files: [file], title: 'Мой список покупок' }); } 
+                    catch (e) { const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click(); }
+                } else {
+                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click();
+                    showToast("Файл скачан!");
                 }
-
-                if (done.length > 0) {
-                    text += `\nУЖЕ КУПЛЕНО:\n`;
-                    done.forEach(i => {
-                        text += `- [x] ${i.text} (${i.quantity} ${i.unit})\n`;
-                    });
-                }
-
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'Список покупок',
-                            text: text
-                        });
-                    } catch (e) { copyFallback(text); }
-                } else { copyFallback(text); }
-            };
-
-            const copyFallback = (text) => {
-                const t = document.createElement("textarea"); t.value = text.trim(); document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
-                showToast("Текст скопирован! Вставьте в Заметки.");
             };
 
             const stats = useMemo(() => {
                 const list = items[activeLoc] || [];
-                return {
-                    total: list.length,
-                    done: list.filter(i => i.completed).length,
-                    percent: list.length ? Math.round((list.filter(i => i.completed).length / list.length) * 100) : 0
-                };
+                const done = list.filter(i => i.completed).length;
+                return { done, total: list.length, percent: list.length ? Math.round((done / list.length) * 100) : 0 };
             }, [items, activeLoc]);
 
-            const groupedHistory = useMemo(() => {
-                const g = {};
-                history.forEach(item => {
-                    const d = new Date(item.doneAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long' });
-                    if (!g[d]) g[d] = []; g[d].push(item);
-                });
-                return g;
-            }, [history]);
-
             return (
-                <div className="min-h-screen flex justify-center items-start sm:p-4 text-slate-800 font-sans select-none">
-                    <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] sm:rounded-[45px] shadow-2xl flex flex-col relative border border-white overflow-hidden transition-all duration-500">
+                <div className="min-h-screen flex justify-center items-start sm:p-4">
+                    <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] sm:rounded-[45px] shadow-2xl flex flex-col relative overflow-hidden border border-white">
                         
-                        <header className="px-5 pt-6 pb-2 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-40">
-                            {view === 'main' ? (
-                                <>
-                                    <div className="flex-1">
-                                        <h1 className="text-xl font-black tracking-tighter leading-none">Умные<span className="text-[#635BFF]">Покупки</span></h1>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
-                                                <div className="h-full bg-[#635BFF] transition-all duration-500" style={{width: `${stats.percent}%`}}></div>
-                                            </div>
-                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{stats.done}/{stats.total} КУПЛЕНО</span>
-                                        </div>
+                        <header className="px-6 pt-8 pb-4 sticky top-0 bg-white/95 backdrop-blur-md z-40 border-b border-slate-50">
+                            <div className="flex justify-between items-center">
+                                <h1 className="text-2xl font-black tracking-tight text-[#1e293b]">Умные<span className="text-[#635BFF]">Покупки</span></h1>
+                                <button onClick={() => setView(view === 'main' ? 'history' : 'main')} className="p-3 bg-slate-50 rounded-2xl text-[#635BFF] active:scale-90 transition-all shadow-sm">
+                                    {view === 'main' ? <Icons.History /> : <Icons.Back />}
+                                </button>
+                            </div>
+                            {view === 'main' && (
+                                <div className="mt-4 flex items-center gap-3">
+                                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#635BFF] transition-all duration-700" style={{width: `${stats.percent}%`}}></div>
                                     </div>
-                                    <button onClick={() => setView('history')} className="ml-4 px-3 h-8 flex items-center justify-center rounded-lg bg-indigo-50 text-[#635BFF] text-[8px] font-black uppercase tracking-widest active:scale-95 transition-all border border-indigo-100">история</button>
-                                </>
-                            ) : (
-                                <div className="flex items-center gap-3 w-full">
-                                    <button onClick={() => setView('main')} className="p-1.5 hover:bg-slate-100 rounded-lg transition-all"><Icons.Back /></button>
-                                    <h1 className="text-lg font-black text-slate-800">История</h1>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stats.done}/{stats.total} КУПЛЕНО</span>
                                 </div>
                             )}
                         </header>
 
                         {view === 'main' ? (
                             <>
-                                <div className="px-5 mb-2 pt-2">
-                                    <div className="bg-[#EEF1F8] p-1 rounded-2xl flex gap-1 shadow-inner border border-slate-100">
+                                <div className="px-6 py-4">
+                                    <div className="bg-slate-100 p-1 rounded-2xl flex gap-1">
                                         {LOCATIONS.map(loc => (
-                                            <button key={loc.id} onClick={() => setActiveLoc(loc.id)} className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-xl text-[9px] font-black transition-all ${activeLoc === loc.id ? 'bg-white text-[#635BFF] shadow-sm' : 'text-slate-400'}`}>
-                                                <span className="text-sm">{loc.icon}</span> {loc.label}
+                                            <button key={loc.id} onClick={() => setActiveLoc(loc.id)} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold transition-all ${activeLoc === loc.id ? 'bg-white text-[#635BFF] shadow-sm' : 'text-slate-400'}`}>
+                                                <span className="text-lg">{loc.icon}</span> {loc.label}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="px-4 mb-2 sticky top-[75px] z-30">
-                                    <div className="bg-white rounded-[20px] shadow-[0_8px_25px_rgba(99,91,255,0.08)] border border-slate-50 p-3 space-y-2">
-                                        <div className="flex gap-1 overflow-x-auto pb-0.5 no-scrollbar items-center touch-pan-x">
-                                            {CATEGORIES.map(cat => (
-                                                <button key={cat.id} onClick={() => { setActiveCat(cat.id); setIsManualCat(true); }} className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[8px] font-black whitespace-nowrap transition-all border ${activeCat === cat.id ? `${cat.bg} ${cat.color} border-current` : 'bg-slate-50 text-slate-400 border-transparent'}`}>
-                                                    <span>{cat.icon}</span> {cat.label.toUpperCase()}
-                                                </button>
-                                            ))}
+                                <div className="px-6 mb-4 sticky top-[135px] z-30">
+                                    <div className="bg-white rounded-3xl shadow-[0_15px_40px_rgba(99,91,255,0.12)] border border-indigo-50 p-5 space-y-4">
+                                        <div className="flex gap-3">
+                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-[#635BFF]/10 outline-none transition-all" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
+                                            <button onClick={addItem} className="bg-[#635BFF] text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl active:scale-90"><Icons.Plus /></button>
                                         </div>
-
-                                        <div className="flex gap-2 items-center">
-                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-lg px-3 py-2 outline-none font-bold text-slate-700 text-xs placeholder:text-slate-300 focus:ring-1 focus:ring-[#635BFF]/20 transition-all" value={inputValue} onChange={(e) => { setInputValue(e.target.value); detectCategory(e.target.value); }} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
-                                            <div className="flex bg-slate-50 rounded-lg items-center px-1">
-                                                <input type="number" className="w-6 bg-transparent text-center font-black text-[#635BFF] py-2 text-[10px]" value={inputQty} onChange={(e) => setInputQty(e.target.value)} />
-                                                <select className="bg-transparent text-[8px] font-black text-slate-400 cursor-pointer appearance-none" value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select>
+                                        <div className="flex gap-3">
+                                            <div className="flex-[2] flex bg-slate-50 rounded-2xl items-center px-4 py-3">
+                                                <input type="number" step="any" className="w-full bg-transparent font-black text-[#635BFF] text-lg outline-none" value={inputQty} onChange={(e) => setInputQty(e.target.value)} />
+                                                <select className="bg-transparent font-black text-slate-400 text-xs appearance-none ml-2 outline-none" value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select>
                                             </div>
-                                            <button onClick={addItem} className="bg-[#635BFF] text-white w-9 h-9 rounded-lg flex items-center justify-center shadow-md active:scale-90 transition-all flex-none"><Icons.Plus /></button>
-                                        </div>
-
-                                        <div className="flex gap-1">
-                                            {PRIORITIES.map(p => (
-                                                <button key={p.id} onClick={() => setActivePriority(p.id)} className={`flex-1 py-1 rounded-md transition-all border flex items-center justify-center ${activePriority === p.id ? `border-[#635BFF]/30 ${p.color}` : 'bg-slate-50 border-transparent text-slate-300'}`}>
-                                                    <span className={`text-xs ${p.id === 'high' && activePriority === p.id ? 'zap-pulse' : ''}`}>{p.icon}</span>
-                                                </button>
-                                            ))}
+                                            <div className="flex-1 flex gap-1">
+                                                {PRIORITIES.map(p => (
+                                                    <button key={p.id} onClick={() => setActivePriority(p.id)} className={`flex-1 rounded-xl flex items-center justify-center transition-all border-2 ${activePriority === p.id ? `border-[#635BFF]/30 ${p.color}` : 'bg-slate-50 border-transparent text-slate-300'}`}>
+                                                        {p.icon}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <main className="flex-1 px-4 overflow-y-auto pb-36 no-scrollbar">
+                                <main className="flex-1 px-6 overflow-y-auto pb-32 no-scrollbar">
                                     {!(items[activeLoc] || []).length ? (
-                                        <div className="py-12 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-4xl mb-2">🧺</span><p className="text-[9px] font-black uppercase tracking-widest">Список пуст</p></div>
+                                        <div className="py-20 flex flex-col items-center opacity-20 text-center animate-pop"><span className="text-6xl mb-4">🛒</span><p className="font-bold uppercase tracking-widest text-sm">Список пуст</p></div>
                                     ) : (
-                                        <div className="space-y-4">
+                                        <div className="space-y-8">
                                             {CATEGORIES.filter(c => (items[activeLoc] || []).some(i => i.category === c.id)).map(cat => {
                                                 const catItems = items[activeLoc].filter(i => i.category === cat.id).sort((a, b) => a.completed - b.completed);
                                                 return (
                                                     <div key={cat.id} className="animate-pop">
-                                                        <div className="flex items-center gap-2 mb-1.5 opacity-40 px-1"><span className={`text-[7px] font-black uppercase tracking-[0.15em] ${cat.color}`}>{cat.icon} {cat.label}</span><div className="h-[0.5px] flex-1 bg-slate-200"></div></div>
-                                                        <div className="space-y-0.5">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className={`text-sm font-black uppercase tracking-widest ${cat.color}`}>{cat.icon} {cat.label}</span>
+                                                            <div className="h-[1px] flex-1 bg-slate-100"></div>
+                                                        </div>
+                                                        <div className="space-y-1.5">
                                                             {catItems.map(item => {
                                                                 const pObj = PRIORITIES.find(p => p.id === item.priority) || PRIORITIES[1];
                                                                 return (
-                                                                    <div key={item.id} className={`flex items-center gap-2 px-2 py-1.5 rounded-xl transition-all ${item.completed ? 'bg-slate-50/50 opacity-40' : 'bg-white border-b border-slate-50 shadow-sm'}`}>
-                                                                        <div onClick={() => toggleItem(item.id)} className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500' : 'border-2 border-slate-100'}`}>
+                                                                    <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
+                                                                        <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
                                                                             {item.completed && <Icons.Check />}
                                                                         </div>
-                                                                        <div className="flex items-center flex-1 min-w-0 gap-1.5" onClick={() => toggleItem(item.id)}>
-                                                                            <span className={`font-bold text-xs truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>{item.text}</span>
-                                                                            <span className="text-[10px] font-black text-[#635BFF] uppercase whitespace-nowrap shrink-0">{item.quantity} {item.unit}</span>
-                                                                            <span className={`text-[10px] shrink-0 opacity-80`}>{pObj.icon}</span>
+                                                                        <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
+                                                                            <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
+                                                                            <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
+                                                                            <span className="opacity-40">{pObj.icon}</span>
                                                                         </div>
-                                                                        <div className="flex gap-0.5 shrink-0 ml-1">
-                                                                            <button onClick={() => setEditingItem(item)} className="p-1 text-slate-300 hover:text-[#635BFF]"><Icons.Brush /></button>
-                                                                            <button onClick={() => {setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}));}} className="p-1 text-slate-300 hover:text-red-400"><Icons.X /></button>
+                                                                        <div className="flex gap-1 shrink-0">
+                                                                            <button onClick={() => setEditingItem(item)} className="p-2 text-slate-300 hover:text-[#635BFF] transition-all"><Icons.Brush /></button>
+                                                                            <button onClick={() => setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}))} className="p-2 text-slate-300 hover:text-red-400 transition-all"><Icons.X /></button>
                                                                         </div>
                                                                     </div>
                                                                 );
@@ -359,52 +388,63 @@
                                     )}
                                 </main>
 
-                                <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-white via-white/95 to-transparent z-40 flex items-center gap-2.5">
-                                    <button onClick={shareToNotes} className="flex-1 h-12 bg-[#121221] text-white rounded-xl font-black text-[8px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
-                                        <Icons.Share /> В ЗАМЕТКИ iPhone
+                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-40 flex items-center gap-3">
+                                    <button onClick={sendInteractiveFile} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
+                                        <Icons.Send /> ОТПРАВИТЬ ФАЙЛ СПИСКА
                                     </button>
-                                    <button onClick={startVoice} className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg transition-all active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white'}`}><Icons.Mic /></button>
+                                    <button onClick={startVoice} className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white'}`}><Icons.Mic /></button>
                                 </div>
                             </>
                         ) : (
-                            <main className="flex-1 px-5 overflow-y-auto pb-10 pt-3 no-scrollbar">
-                                {!history.length ? <div className="py-12 flex flex-col items-center opacity-20 text-center"><span className="text-3xl mb-2">⏳</span><p className="font-black text-[9px] uppercase">История пуста</p></div> : <div className="space-y-6 pt-2 pb-20">
-                                    {Object.entries(groupedHistory).map(([date, items]) => (
-                                        <div key={date} className="animate-pop">
-                                            <div className="flex items-center gap-2 mb-2.5"><div className="h-[0.5px] flex-1 bg-indigo-50"></div><span className="text-[8px] font-black uppercase text-indigo-300 tracking-widest">{date}</span><div className="h-[0.5px] flex-1 bg-indigo-50"></div></div>
-                                            <div className="space-y-1">{items.map((h, i) => (<div key={i} className="bg-white p-2 rounded-xl border border-slate-50 shadow-sm flex justify-between items-center"><div className="flex items-center gap-2 min-w-0"><span className="font-bold text-[11px] text-slate-700 truncate">{h.text}</span><span className="text-[8px] font-black text-[#635BFF] uppercase shrink-0">{h.quantity} {h.unit}</span></div><span className="text-xs opacity-30 shrink-0">{CATEGORIES.find(c=>c.id===h.category)?.icon || '📦'}</span></div>))}</div>
-                                        </div>
-                                    ))}
-                                    <button onClick={() => setHistory([])} className="w-full py-4 text-[8px] font-black uppercase text-slate-300 hover:text-red-400">Очистить историю</button>
-                                </div>}
+                            <main className="flex-1 px-6 overflow-y-auto pb-10 pt-4 no-scrollbar">
+                                {!history.length ? <div className="py-20 flex flex-col items-center opacity-20 text-center"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase">История пуста</p></div> : (
+                                    <div className="space-y-4 pb-20">
+                                        {history.map((h, i) => (
+                                            <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center animate-pop">
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-lg text-slate-700">{h.text}</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{new Date(h.doneAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long' })}</span>
+                                                </div>
+                                                <span className="text-2xl opacity-30">{CATEGORIES.find(c=>c.id===h.category)?.icon}</span>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => setHistory([])} className="w-full py-6 text-xs font-black uppercase text-slate-300 hover:text-red-400 transition-colors">Очистить историю</button>
+                                    </div>
+                                )}
                             </main>
                         )}
 
                         {editingItem && (
-                            <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-4">
-                                <div className="bg-white w-full max-w-sm rounded-[32px] p-6 shadow-2xl animate-pop overflow-y-auto max-h-[85vh]">
-                                    <div className="flex justify-between items-center mb-4"><h2 className="text-base font-black text-slate-800 tracking-tight">Правка</h2><button onClick={() => setEditingItem(null)} className="p-1 bg-slate-50 rounded-lg text-slate-400"><Icons.X /></button></div>
-                                    <div className="space-y-4">
-                                        <div className="space-y-1.5"><label className="text-[8px] font-black text-slate-400 uppercase px-1">Название</label><input type="text" className="w-full bg-slate-50 rounded-xl px-4 py-3 font-bold text-xs outline-none border border-slate-100 focus:border-[#635BFF]" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} /></div>
-                                        <div className="flex gap-3"><div className="flex-1"><label className="text-[8px] font-black text-slate-400 uppercase px-1">Кол-во</label><input type="number" className="w-full bg-slate-50 rounded-xl px-4 py-3 font-black text-[#635BFF] text-xs border border-slate-100" value={editingItem.quantity} onChange={(e) => setEditingItem({...editingItem, quantity: e.target.value})} /></div><div className="flex-1"><label className="text-[8px] font-black text-slate-400 uppercase px-1">Ед. изм.</label><select className="w-full bg-slate-50 rounded-xl px-4 py-3 font-black text-[#635BFF] text-xs border border-slate-100 appearance-none" value={editingItem.unit} onChange={(e) => setEditingItem({...editingItem, unit: e.target.value})}>{UNITS.map(u => <option key={u} value={u}>{u}</option>)}</select></div></div>
-                                        <div className="space-y-1.5"><label className="text-[8px] font-black text-slate-400 uppercase px-1">Категория</label>
-                                            <div className="relative"><select className="w-full bg-slate-50 rounded-xl px-4 py-3 font-bold text-slate-700 text-xs border border-slate-100 appearance-none cursor-pointer" value={editingItem.category} onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}>{CATEGORIES.map(c => (<option key={c.id} value={c.id}>{c.icon} {c.label}</option>))}</select><div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400"><Icons.ChevronDown /></div></div>
+                            <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center p-6">
+                                <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-pop border border-white">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-lg font-black text-slate-800">Правка</h2><button onClick={() => setEditingItem(null)} className="p-2 bg-slate-50 rounded-xl text-slate-400"><Icons.X /></button>
+                                    </div>
+                                    <div className="space-y-5">
+                                        <input type="text" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none focus:ring-2 focus:ring-[#635BFF]/10" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} />
+                                        <div className="relative">
+                                            <select className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-slate-700 text-base border border-slate-100 appearance-none cursor-pointer outline-none" value={editingItem.category} onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}>
+                                                {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+                                            </select>
+                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-30"><Icons.ChevronDown /></div>
                                         </div>
                                         <button onClick={() => { 
-                                            const ns = {...items}; ns[activeLoc] = ns[activeLoc].map(i => i.id === editingItem.id ? editingItem : i);
-                                            setItems(ns); setEditingItem(null); showToast('Сохранено'); 
-                                        }} className="w-full bg-[#635BFF] py-3.5 rounded-xl text-white font-black uppercase text-[9px] tracking-widest shadow-lg active:scale-95 transition-all mt-2">Сохранить</button>
+                                            const ns = {...items}; 
+                                            ns[activeLoc] = ns[activeLoc].map(i => i.id === editingItem.id ? editingItem : i);
+                                            setItems(ns); setEditingItem(null); showToast('Сохранено!'); 
+                                        }} className="w-full bg-[#635BFF] py-5 rounded-3xl text-white font-black uppercase text-sm shadow-lg active:scale-95 transition-all mt-4 tracking-widest text-center">Сохранить</button>
                                     </div>
                                 </div>
                             </div>
                         )}
-                        {toast && <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-xl shadow-xl text-[9px] font-black z-[60] animate-pop">{toast}</div>}
+                        {toast && <div className="fixed bottom-28 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-2xl shadow-2xl text-xs font-bold z-[60] animate-pop">{toast}</div>}
                     </div>
                 </div>
             );
         }
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
