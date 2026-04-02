@@ -64,11 +64,10 @@
             Send: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         };
 
-        // Словарь для автоматического определения категорий
         const DICTIONARY = {
             'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш', 'куриц', 'кура', 'индеик', 'утк', 'гусь', 'филе', 'рыб', 'кревет', 'лосось'],
             'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк', 'яйц'],
-            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач', 'яблок', 'цитрус', 'апелсин', 'лимон', 'клубник', 'черник', 'банан', 'черен', 'вишн', 'персик', 'груш'],
+            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач', 'яблок', 'цитрус', 'апелсин', 'лимон', 'клубник', 'черник', 'банан', 'вишн', 'персик', 'груш'],
             'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'гречк', 'рис', 'крупа', 'масло', 'кетчуп', 'майонез'],
             'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи', 'дезодор', 'ватн'],
             'хозтовары': ['порошок', 'губка', 'салфет', 'бумаг', 'пакет', 'средство', 'фейри', 'доместос']
@@ -87,7 +86,6 @@
 
         const UNITS = ['шт', 'кг', 'г', 'л', 'мл', 'упак'];
 
-        // Расширенный словарь соответствий единиц
         const UNIT_MAP = {
             'кг': 'кг', 'килограмм': 'кг', 'килограмма': 'кг', 'килограммов': 'кг', 'кило': 'кг',
             'г': 'г', 'грамм': 'г', 'грамма': 'г', 'граммов': 'г',
@@ -124,69 +122,49 @@
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
 
-            // УЛУЧШЕННЫЙ ПАРСЕР ГОЛОСА
             const parseVoiceInput = (text) => {
                 let lower = text.toLowerCase().trim();
                 let quantity = '1';
                 let unit = 'шт';
                 let name = text;
 
-                // 1. Заменяем слова-числа на цифры
                 Object.keys(WORD_NUMBERS).forEach(word => {
-                    if (lower.includes(word)) {
-                        lower = lower.replace(word, WORD_NUMBERS[word]);
-                    }
+                    if (lower.includes(word)) { lower = lower.replace(word, WORD_NUMBERS[word]); }
                 });
 
-                // 2. Ищем конструкцию: [Число] [Единица измерения]
                 const match = lower.match(/(\d+(?:[.,]\d+)?)\s*([а-яё]+)?/);
-                
                 if (match) {
                     quantity = match[1].replace(',', '.');
                     const wordAfterNum = match[2];
-                    
                     if (wordAfterNum) {
-                        // Проверяем, есть ли такое слово в нашем словаре единиц
                         for (const [key, val] of Object.entries(UNIT_MAP)) {
                             if (wordAfterNum.startsWith(key.substring(0, 3))) {
                                 unit = val;
-                                // Если нашли единицу, убираем всё это из названия
                                 name = lower.replace(match[0], '').trim();
                                 break;
                             }
                         }
-                    } else {
-                        // Если только число, просто убираем число
-                        name = lower.replace(match[1], '').trim();
-                    }
+                    } else { name = lower.replace(match[1], '').trim(); }
                 }
-
-                // Убираем лишние слова типа "купи", "возьми", "пожалуйста"
                 name = name.replace(/^(купи|возьми|надо|добавь|плиз|пожалуйста)\s+/i, '').trim();
-
                 return { name: name || text, quantity, unit };
             };
 
             const startVoice = () => {
                 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SR) return showToast("Голос не поддерживается вашим браузером");
-                
+                if (!SR) return showToast("Голос не поддерживается");
                 const rec = new SR();
                 rec.lang = 'ru-RU';
                 rec.onstart = () => setIsListening(true);
-                
                 rec.onresult = (e) => { 
                     const transcript = e.results[0][0].transcript;
                     const parsed = parseVoiceInput(transcript);
-                    
                     setInputValue(parsed.name);
                     setInputQty(parsed.quantity);
                     setInputUnit(parsed.unit);
-                    
                     showToast(`Распознано: ${parsed.name}`);
                     setIsListening(false); 
                 };
-                
                 rec.onerror = () => setIsListening(false);
                 rec.onend = () => setIsListening(false);
                 rec.start();
@@ -216,11 +194,12 @@
                 setItems({...items, [activeLoc]: list});
             };
 
+            // ФОРМИРОВАНИЕ УЛУЧШЕННОГО ФАЙЛА
             const sendInteractiveFile = async () => {
                 const locItems = items[activeLoc] || [];
                 if (!locItems.length) return showToast("Список пуст");
 
-                const itemsJson = JSON.stringify(locItems);
+                const itemsJson = JSON.stringify(locItems).replace(/</g, '\\u003c');
                 const fileContent = `
 <!DOCTYPE html>
 <html lang="ru">
@@ -229,60 +208,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список: ${activeLoc.toUpperCase()}</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         h1 { font-size: 24px; color: #635bff; margin-bottom: 20px; text-align: center; font-weight: 900; }
-        .item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; user-select: none; }
         .item.done { opacity: 0.4; }
-        .checkbox { width: 28px; height: 28px; border: 2px solid #cbd5e1; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; }
+        .checkbox { width: 28px; height: 28px; border: 2px solid #cbd5e1; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .done .checkbox { background: #10b981; border-color: #10b981; color: white; }
-        .done .checkbox::after { content: '✔'; font-weight: bold; }
+        .done .checkbox::after { content: '✔'; font-weight: bold; color: white; }
         .text { font-size: 18px; font-weight: 600; flex: 1; }
         .qty { color: #635bff; font-weight: 800; font-size: 14px; margin-left: 10px; border-left: 2px solid #eee; padding-left: 10px; }
         .done .text { text-decoration: line-through; }
         .btn { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-save { background: #635bff; color: white; box-shadow: 0 4px 14px rgba(99,91,255,0.4); }
         .btn-reset { background: #f1f5f9; color: #64748b; margin-top: 10px; }
-        .btn:active { transform: scale(0.98); }
+        .status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
     <div class="card">
         <h1>🛒 Список покупок</h1>
         <div id="list"></div>
-        <button class="btn btn-save" onclick="save()">💾 Скачать версию с отметками</button>
+        <button class="btn btn-save" id="saveBtn">💾 Скачать версию с отметками</button>
         <button class="btn btn-reset" onclick="reset()">🔄 Сбросить все отметки</button>
+        <p id="status" class="status-msg">Если скачивание не началось, попробуйте открыть файл в обычном браузере.</p>
     </div>
     <script>
         let data = ${itemsJson};
+        const listContainer = document.getElementById('list');
+        const saveBtn = document.getElementById('saveBtn');
+        const statusMsg = document.getElementById('status');
+
         function render() {
-            const c = document.getElementById('list'); c.innerHTML = '';
+            listContainer.innerHTML = '';
             data.forEach((i, idx) => {
-                const d = document.createElement('div'); d.className = 'item' + (i.completed ? ' done' : '');
+                const d = document.createElement('div');
+                d.className = 'item' + (i.completed ? ' done' : '');
                 d.onclick = () => { data[idx].completed = !data[idx].completed; render(); };
                 d.innerHTML = '<div class="checkbox"></div><div class="text">' + i.text + '<span class="qty">' + i.quantity + ' ' + i.unit + '</span></div>';
-                c.appendChild(d);
+                listContainer.appendChild(d);
             });
         }
-        function reset() { data.forEach(i => i.completed = false); render(); }
-        function save() {
-            const h = document.documentElement.outerHTML.replace(/let data = .*;/, 'let data = ' + JSON.stringify(data) + ';');
-            const b = new Blob([h], {type: 'text/html'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'spisok-s-otmetkami.html'; a.click();
+
+        function reset() { 
+            if(confirm('Сбросить все отметки?')) {
+                data.forEach(i => i.completed = false); 
+                render(); 
+            }
         }
+
+        saveBtn.onclick = function() {
+            try {
+                const currentHtml = document.documentElement.outerHTML;
+                const updatedHtml = currentHtml.replace(/let data = .*;/, 'let data = ' + JSON.stringify(data) + ';');
+                const blob = new Blob([updatedHtml], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'shopping_list_updated.html';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                statusMsg.style.display = 'block';
+            } catch (e) {
+                alert('Ошибка при сохранении. Попробуйте открыть список в браузере Safari или Chrome.');
+            }
+        };
+
         render();
     <\/script>
 </body>
 </html>`;
+
                 const blob = new Blob([fileContent], { type: 'text/html' });
                 const file = new File([blob], `spisok-${activeLoc}.html`, { type: 'text/html' });
 
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try { await navigator.share({ files: [file], title: 'Мой список покупок' }); } 
+                    try { await navigator.share({ files: [file], title: 'Мой список покупок', text: 'Открой этот файл в браузере!' }); } 
                     catch (e) { const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click(); }
                 } else {
                     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click();
-                    showToast("Файл скачан!");
+                    showToast("Файл сформирован!");
                 }
             };
 
@@ -364,7 +373,7 @@
                                                             {catItems.map(item => {
                                                                 const pObj = PRIORITIES.find(p => p.id === item.priority) || PRIORITIES[1];
                                                                 return (
-                                                                    <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
+                                                                    <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100 hover:border-indigo-100'}`}>
                                                                         <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
                                                                             {item.completed && <Icons.Check />}
                                                                         </div>
@@ -392,7 +401,7 @@
                                     <button onClick={sendInteractiveFile} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
                                         <Icons.Send /> ОТПРАВИТЬ ФАЙЛ СПИСКА
                                     </button>
-                                    <button onClick={startVoice} className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white'}`}><Icons.Mic /></button>
+                                    <button onClick={startVoice} className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white hover:bg-indigo-500'}`}><Icons.Mic /></button>
                                 </div>
                             </>
                         ) : (
