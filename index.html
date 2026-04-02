@@ -16,7 +16,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
-        // Безопасная инициализация Tailwind Config
         window.addEventListener('DOMContentLoaded', () => {
             if (window.tailwind) {
                 tailwind.config = { 
@@ -48,7 +47,6 @@
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .zap-pulse { animation: zap 1.2s infinite; }
         @keyframes zap { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
-        select { -webkit-appearance: none; appearance: none; }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -101,7 +99,7 @@
 
             const [items, setItems] = useState(() => {
                 try {
-                    const saved = localStorage.getItem('ss_v600_items');
+                    const saved = localStorage.getItem('ss_v700_items');
                     return saved ? JSON.parse(saved) : {};
                 } catch (e) { return {}; }
             });
@@ -116,7 +114,7 @@
             const [isListening, setIsListening] = useState(false);
 
             useEffect(() => {
-                localStorage.setItem('ss_v600_items', JSON.stringify(items));
+                localStorage.setItem('ss_v700_items', JSON.stringify(items));
             }, [items]);
 
             const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -193,27 +191,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список покупок</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 15px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         h1 { font-size: 20px; color: #635bff; margin-bottom: 20px; text-align: center; font-weight: 900; }
-        .item { display: flex; align-items: center; gap: 15px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; user-select: none; }
+        .item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; user-select: none; }
         .checkbox { width: 30px; height: 30px; border: 2px solid #cbd5e1; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .done { opacity: 0.4; }
         .done .checkbox { background: #10b981; border-color: #10b981; }
         .done .checkbox::after { content: '✔'; color: white; font-weight: bold; font-size: 18px; }
-        .text { font-size: 18px; font-weight: 600; flex: 1; }
+        .text { font-size: 17px; font-weight: 600; flex: 1; }
         .done .text { text-decoration: line-through; }
-        .qty { color: #635bff; font-weight: 800; font-size: 14px; margin-left: 10px; }
-        .btn-reset { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; background: #f1f5f9; color: #64748b; }
-        .alert { background: #fffbeb; padding: 12px; border-radius: 12px; font-size: 13px; margin-bottom: 20px; color: #92400e; border: 1px solid #fef3c7; line-height: 1.4; text-align: center; }
+        .qty { color: #635bff; font-weight: 800; font-size: 13px; margin-left: 10px; }
+        .btn { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-copy { background: #1e293b; color: white; }
+        .btn-reset { background: #f1f5f9; color: #64748b; margin-top: 10px; }
+        .alert { background: #fffbeb; padding: 15px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; color: #92400e; border: 1px solid #fef3c7; line-height: 1.4; text-align: left; }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="alert">⚠️ <b>Для работы кнопок:</b> Нажмите иконку "Поделиться" и выберите <b>"Открыть в Safari"</b> (или Chrome).</div>
+        <div class="alert">
+            <b>Для iPhone:</b> Если галочки не ставятся, нажмите кнопку "Поделиться" (квадрат со стрелкой), выберите "Скопировать" и вставьте эту ссылку в обычный Safari.
+        </div>
         <h1>🛒 Мой список</h1>
         <div id="list"></div>
-        <button class="btn-reset" onclick="resetAll()">🔄 Сбросить отметки</button>
+        <button class="btn btn-copy" onclick="copyRest()">📋 Скопировать результат</button>
+        <button class="btn btn-reset" onclick="resetAll()">🔄 Сбросить отметки</button>
     </div>
     <script>
         const listId = "${listId}";
@@ -234,6 +237,11 @@
         }
         function save() { const states = {}; data.forEach(i => states[i.id] = i.completed); localStorage.setItem(listId, JSON.stringify(states)); }
         function resetAll() { if(confirm('Сбросить?')) { data.forEach(i => i.completed = false); save(); render(); } }
+        function copyRest() {
+            const t = data.map(i => (i.completed ? '✅ ' : '⬜ ') + i.text + " (" + i.quantity + " " + i.unit + ")").join('\\n');
+            const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert('Список скопирован! Отправьте его обратно в чат.');
+        }
         render();
     <\/script>
 </body>
@@ -315,7 +323,7 @@
                                                             <span className={`text-sm font-black uppercase tracking-widest ${cat.color}`}>{cat.icon} {cat.label}</span>
                                                             <div className="h-[1px] flex-1 bg-slate-100"></div>
                                                         </div>
-                                                        <div className="space-y-1.5">
+                                                        <div className="space-y-1">
                                                             {catItems.map(item => (
                                                                 <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
                                                                     <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
