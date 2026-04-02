@@ -32,7 +32,7 @@
             overscroll-behavior-y: contain; 
             background-color: #f8fafc;
             font-family: 'Manrope', sans-serif;
-            font-size: 16px; 
+            font-size: 17px; 
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -59,18 +59,18 @@
             Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
             X: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
             History: () => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>,
-            Back: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
             ChevronDown: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>,
             Send: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         };
 
         const DICTIONARY = {
-            'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш', 'куриц', 'кура', 'индеик', 'утк', 'гусь', 'филе', 'рыб', 'кревет', 'лосось'],
+            'мясо': ['говяд', 'свин', 'баран', 'печен', 'язык', 'мяс', 'стейк', 'фарш', 'куриц', 'кура', 'индеик', 'рыб', 'лосось', 'форель'],
             'молочка': ['молок', 'кефир', 'творог', 'сметан', 'йогурт', 'сыр', 'масл', 'сливк', 'яйц'],
-            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'баклаж', 'кабач', 'яблок', 'цитрус', 'апелсин', 'лимон', 'клубник', 'черник', 'банан', 'вишн', 'персик', 'груш'],
-            'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'гречк', 'рис', 'крупа', 'масло', 'кетчуп', 'майонез'],
-            'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи', 'дезодор', 'ватн'],
-            'хозтовары': ['порошок', 'губка', 'салфет', 'бумаг', 'пакет', 'средство', 'фейри', 'доместос']
+            'овощи': ['картоф', 'кукуруз', 'лук', 'морков', 'свекл', 'редис', 'капуст', 'томат', 'помидор', 'огур', 'перц', 'яблок', 'апелс', 'банан', 'груш'],
+            'бакалея': ['хлеб', 'батон', 'мука', 'сахар', 'соль', 'макарон', 'рис', 'гречк', 'крупа'],
+            'соусы': ['майонез', 'кетчуп', 'соев', 'горчиц', 'соус', 'аджик'],
+            'красота': ['шампунь', 'мыло', 'крем', 'паста', 'щетка', 'гель', 'маска', 'духи', 'дезодор', 'ватн', 'бритв', 'бальзам'],
+            'хозтовары': ['порошок', 'губка', 'салфет', 'бумаг', 'пакет', 'средство', 'фейри', 'доместос', 'белизн']
         };
 
         const CATEGORIES = [
@@ -85,26 +85,14 @@
         ];
 
         const UNITS = ['шт', 'кг', 'г', 'л', 'мл', 'упак'];
-
-        const UNIT_MAP = {
-            'кг': 'кг', 'килограмм': 'кг', 'килограмма': 'кг', 'килограммов': 'кг', 'кило': 'кг',
-            'г': 'г', 'грамм': 'г', 'грамма': 'г', 'граммов': 'г',
-            'л': 'л', 'литр': 'л', 'литра': 'л', 'литров': 'л',
-            'мл': 'мл', 'миллилитр': 'мл', 'миллилитра': 'мл', 'миллилитров': 'мл',
-            'шт': 'шт', 'штука': 'шт', 'штуки': 'шт', 'штук': 'шт',
-            'упак': 'упак', 'упаковка': 'упак', 'упаковки': 'упак', 'упаковок': 'упак'
-        };
-
-        const WORD_NUMBERS = {
-            'один': '1', 'одна': '1', 'два': '2', 'две': '2', 'три': '3', 'четыре': '4', 'пять': '5', 'полтора': '1.5', 'половина': '0.5'
-        };
+        const UNIT_MAP = { 'кг': 'кг', 'килограмм': 'кг', 'кило': 'кг', 'г': 'г', 'грамм': 'г', 'л': 'л', 'литр': 'л', 'мл': 'мл', 'шт': 'шт', 'упак': 'упак' };
+        const WORD_NUMBERS = { 'один': '1', 'два': '2', 'три': '3', 'четыре': '4', 'пять': '5', 'полтора': '1.5' };
 
         function App() {
             const PRIORITIES = [{ id: 'low', icon: '🕒', color: 'text-slate-400 bg-slate-50' }, { id: 'medium', icon: '➖', color: 'text-[#635BFF] bg-indigo-50' }, { id: 'high', icon: '⚡', color: 'text-red-500 bg-red-50' }];
             const LOCATIONS = [{ id: 'магазин', label: 'Магазин', icon: '🛒' }, { id: 'рынок', label: 'Рынок', icon: '🧺' }, { id: 'онлайн', label: 'Онлайн', icon: '🚚' }];
 
-            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_v100_items')) || {});
-            const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('ss_v100_hist')) || []);
+            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('ss_v200_items')) || {});
             const [activeLoc, setActiveLoc] = useState('магазин');
             const [inputValue, setInputValue] = useState('');
             const [inputQty, setInputQty] = useState('1');
@@ -116,33 +104,22 @@
             const [isListening, setIsListening] = useState(false);
 
             useEffect(() => {
-                localStorage.setItem('ss_v100_items', JSON.stringify(items));
-                localStorage.setItem('ss_v100_hist', JSON.stringify(history));
-            }, [items, history]);
+                localStorage.setItem('ss_v200_items', JSON.stringify(items));
+            }, [items]);
 
-            const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+            const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
             const parseVoiceInput = (text) => {
                 let lower = text.toLowerCase().trim();
-                let quantity = '1';
-                let unit = 'шт';
-                let name = text;
-
-                Object.keys(WORD_NUMBERS).forEach(word => {
-                    if (lower.includes(word)) { lower = lower.replace(word, WORD_NUMBERS[word]); }
-                });
-
+                let quantity = '1', unit = 'шт', name = text;
+                Object.keys(WORD_NUMBERS).forEach(word => { if (lower.includes(word)) { lower = lower.replace(word, WORD_NUMBERS[word]); } });
                 const match = lower.match(/(\d+(?:[.,]\d+)?)\s*([а-яё]+)?/);
                 if (match) {
                     quantity = match[1].replace(',', '.');
                     const wordAfterNum = match[2];
                     if (wordAfterNum) {
                         for (const [key, val] of Object.entries(UNIT_MAP)) {
-                            if (wordAfterNum.startsWith(key.substring(0, 3))) {
-                                unit = val;
-                                name = lower.replace(match[0], '').trim();
-                                break;
-                            }
+                            if (wordAfterNum.startsWith(key.substring(0, 2))) { unit = val; name = lower.replace(match[0], '').trim(); break; }
                         }
                     } else { name = lower.replace(match[1], '').trim(); }
                 }
@@ -153,20 +130,14 @@
             const startVoice = () => {
                 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SR) return showToast("Голос не поддерживается");
-                const rec = new SR();
-                rec.lang = 'ru-RU';
+                const rec = new SR(); rec.lang = 'ru-RU';
                 rec.onstart = () => setIsListening(true);
                 rec.onresult = (e) => { 
-                    const transcript = e.results[0][0].transcript;
-                    const parsed = parseVoiceInput(transcript);
-                    setInputValue(parsed.name);
-                    setInputQty(parsed.quantity);
-                    setInputUnit(parsed.unit);
-                    showToast(`Распознано: ${parsed.name}`);
-                    setIsListening(false); 
+                    const p = parseVoiceInput(e.results[0][0].transcript);
+                    setInputValue(p.name); setInputQty(p.quantity); setInputUnit(p.unit);
+                    showToast(`Определено: ${p.name}`); setIsListening(false); 
                 };
                 rec.onerror = () => setIsListening(false);
-                rec.onend = () => setIsListening(false);
                 rec.start();
             };
 
@@ -174,125 +145,102 @@
                 if (!inputValue.trim()) return;
                 const low = inputValue.toLowerCase();
                 let cat = 'другое';
-                for (const [id, kw] of Object.entries(DICTIONARY)) { 
-                    if (kw.some(k => low.includes(k))) { cat = id; break; } 
-                }
+                for (const [id, kw] of Object.entries(DICTIONARY)) { if (kw.some(k => low.includes(k))) { cat = id; break; } }
                 const newItem = { id: Date.now(), text: inputValue.trim(), quantity: inputQty, unit: inputUnit, priority: activePriority, completed: false, category: cat, location: activeLoc };
                 setItems(prev => ({...prev, [activeLoc]: [newItem, ...(prev[activeLoc] || [])]}));
-                setInputValue(''); setInputQty('1'); setActivePriority('medium');
+                setInputValue(''); setInputQty('1');
             };
 
             const toggleItem = (id) => {
-                const list = (items[activeLoc] || []).map(item => {
-                    if (item.id === id) {
-                        const done = !item.completed;
-                        if (done) setHistory(h => [{...item, doneAt: new Date().toISOString()}, ...h].slice(0, 100));
-                        return {...item, completed: done};
-                    }
-                    return item;
-                });
+                const list = (items[activeLoc] || []).map(item => item.id === id ? {...item, completed: !item.completed} : item);
                 setItems({...items, [activeLoc]: list});
             };
 
-            // ФОРМИРОВАНИЕ УЛУЧШЕННОГО ФАЙЛА
-            const sendInteractiveFile = async () => {
+            const shareInteractiveFile = async () => {
                 const locItems = items[activeLoc] || [];
                 if (!locItems.length) return showToast("Список пуст");
 
+                const listId = "list_" + activeLoc + "_" + Date.now();
                 const itemsJson = JSON.stringify(locItems).replace(/</g, '\\u003c');
+                
                 const fileContent = `
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список: ${activeLoc.toUpperCase()}</title>
+    <title>Список покупок</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
+        body { font-family: -apple-system, sans-serif; padding: 20px; background: #f8fafc; color: #1e293b; max-width: 500px; margin: auto; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        h1 { font-size: 24px; color: #635bff; margin-bottom: 20px; text-align: center; font-weight: 900; }
-        .item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; user-select: none; }
-        .item.done { opacity: 0.4; }
-        .checkbox { width: 28px; height: 28px; border: 2px solid #cbd5e1; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .done .checkbox { background: #10b981; border-color: #10b981; color: white; }
-        .done .checkbox::after { content: '✔'; font-weight: bold; color: white; }
-        .text { font-size: 18px; font-weight: 600; flex: 1; }
-        .qty { color: #635bff; font-weight: 800; font-size: 14px; margin-left: 10px; border-left: 2px solid #eee; padding-left: 10px; }
+        h1 { font-size: 20px; color: #635bff; margin-bottom: 20px; text-align: center; }
+        .item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+        .checkbox { width: 28px; height: 28px; border: 2px solid #cbd5e1; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .done { opacity: 0.4; }
+        .done .checkbox { background: #10b981; border-color: #10b981; }
+        .done .checkbox::after { content: '✔'; color: white; font-weight: bold; }
+        .text { font-size: 17px; font-weight: 600; flex: 1; }
         .done .text { text-decoration: line-through; }
-        .btn { display: block; width: 100%; padding: 18px; margin-top: 20px; border-radius: 15px; border: none; font-weight: 800; font-size: 15px; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn-save { background: #635bff; color: white; box-shadow: 0 4px 14px rgba(99,91,255,0.4); }
+        .qty { color: #635bff; font-weight: 800; font-size: 13px; margin-left: 10px; }
+        .btn { display: block; width: 100%; padding: 16px; margin-top: 20px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-copy { background: #1e293b; color: white; }
         .btn-reset { background: #f1f5f9; color: #64748b; margin-top: 10px; }
-        .status-msg { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 15px; display: none; }
+        .alert { background: #fffbeb; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; text-align: center; color: #92400e; border: 1px solid #fef3c7; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>🛒 Список покупок</h1>
+        <div class="alert">Чтобы отметки сохранялись в памяти телефона, откройте этот файл через Safari или Chrome (а не внутри Telegram).</div>
+        <h1>🛒 Мой список</h1>
         <div id="list"></div>
-        <button class="btn btn-save" id="saveBtn">💾 Скачать версию с отметками</button>
-        <button class="btn btn-reset" onclick="reset()">🔄 Сбросить все отметки</button>
-        <p id="status" class="status-msg">Если скачивание не началось, попробуйте открыть файл в обычном браузере.</p>
+        <button class="btn btn-copy" onclick="copyRest()">📋 Скопировать остаток</button>
+        <button class="btn btn-reset" onclick="resetAll()">🔄 Сбросить отметки</button>
     </div>
     <script>
+        const listId = "${listId}";
         let data = ${itemsJson};
-        const listContainer = document.getElementById('list');
-        const saveBtn = document.getElementById('saveBtn');
-        const statusMsg = document.getElementById('status');
-
+        const saved = localStorage.getItem(listId);
+        if (saved) {
+            const states = JSON.parse(saved);
+            data.forEach(i => { if(states[i.id] !== undefined) i.completed = states[i.id]; });
+        }
         function render() {
-            listContainer.innerHTML = '';
+            const c = document.getElementById('list'); c.innerHTML = '';
             data.forEach((i, idx) => {
                 const d = document.createElement('div');
                 d.className = 'item' + (i.completed ? ' done' : '');
-                d.onclick = () => { data[idx].completed = !data[idx].completed; render(); };
+                d.onclick = () => { data[idx].completed = !data[idx].completed; save(); render(); };
                 d.innerHTML = '<div class="checkbox"></div><div class="text">' + i.text + '<span class="qty">' + i.quantity + ' ' + i.unit + '</span></div>';
-                listContainer.appendChild(d);
+                c.appendChild(d);
             });
         }
-
-        function reset() { 
-            if(confirm('Сбросить все отметки?')) {
-                data.forEach(i => i.completed = false); 
-                render(); 
-            }
+        function save() {
+            const states = {}; data.forEach(i => states[i.id] = i.completed);
+            localStorage.setItem(listId, JSON.stringify(states));
         }
-
-        saveBtn.onclick = function() {
-            try {
-                const currentHtml = document.documentElement.outerHTML;
-                const updatedHtml = currentHtml.replace(/let data = .*;/, 'let data = ' + JSON.stringify(data) + ';');
-                const blob = new Blob([updatedHtml], {type: 'text/html'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'shopping_list_updated.html';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                statusMsg.style.display = 'block';
-            } catch (e) {
-                alert('Ошибка при сохранении. Попробуйте открыть список в браузере Safari или Chrome.');
-            }
-        };
-
+        function resetAll() { if(confirm('Сбросить?')) { data.forEach(i => i.completed = false); save(); render(); } }
+        function copyRest() {
+            const t = data.filter(i => !i.completed).map(i => "⬜ " + i.text + " (" + i.quantity + " " + i.unit + ")").join('\\n');
+            navigator.clipboard.writeText(t || "Всё куплено!").then(() => alert('Список скопирован!'));
+        }
         render();
     <\/script>
 </body>
 </html>`;
-
+                
                 const blob = new Blob([fileContent], { type: 'text/html' });
                 const file = new File([blob], `spisok-${activeLoc}.html`, { type: 'text/html' });
 
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try { await navigator.share({ files: [file], title: 'Мой список покупок', text: 'Открой этот файл в браузере!' }); } 
-                    catch (e) { const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click(); }
-                } else {
-                    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `spisok-${activeLoc}.html`; link.click();
-                    showToast("Файл сформирован!");
-                }
+                    try { await navigator.share({ files: [file], title: 'Мой список покупок' }); } 
+                    catch (e) { triggerDownload(blob); }
+                } else { triggerDownload(blob); }
+            };
+
+            const triggerDownload = (blob) => {
+                const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                link.download = `spisok-${activeLoc}.html`; link.click();
+                showToast("Файл сохранен в Загрузки");
             };
 
             const stats = useMemo(() => {
@@ -308,7 +256,7 @@
                         <header className="px-6 pt-8 pb-4 sticky top-0 bg-white/95 backdrop-blur-md z-40 border-b border-slate-50">
                             <div className="flex justify-between items-center">
                                 <h1 className="text-2xl font-black tracking-tight text-[#1e293b]">Умные<span className="text-[#635BFF]">Покупки</span></h1>
-                                <button onClick={() => setView(view === 'main' ? 'history' : 'main')} className="p-3 bg-slate-50 rounded-2xl text-[#635BFF] active:scale-90 transition-all shadow-sm">
+                                <button onClick={() => setView(view === 'main' ? 'history' : 'main')} className="p-3 bg-slate-50 rounded-2xl text-[#635BFF] active:scale-90 transition-all">
                                     {view === 'main' ? <Icons.History /> : <Icons.Back />}
                                 </button>
                             </div>
@@ -317,7 +265,7 @@
                                     <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div className="h-full bg-[#635BFF] transition-all duration-700" style={{width: `${stats.percent}%`}}></div>
                                     </div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stats.done}/{stats.total} КУПЛЕНО</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase">{stats.done}/{stats.total} КУПЛЕНО</span>
                                 </div>
                             )}
                         </header>
@@ -337,7 +285,7 @@
                                 <div className="px-6 mb-4 sticky top-[135px] z-30">
                                     <div className="bg-white rounded-3xl shadow-[0_15px_40px_rgba(99,91,255,0.12)] border border-indigo-50 p-5 space-y-4">
                                         <div className="flex gap-3">
-                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-[#635BFF]/10 outline-none transition-all" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
+                                            <input type="text" placeholder="Что купить?" className="flex-1 bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-[#635BFF]/10 outline-none" value={inputValue} onChange={(e) => setInputValue(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && addItem()} />
                                             <button onClick={addItem} className="bg-[#635BFF] text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl active:scale-90"><Icons.Plus /></button>
                                         </div>
                                         <div className="flex gap-3">
@@ -365,30 +313,26 @@
                                                 const catItems = items[activeLoc].filter(i => i.category === cat.id).sort((a, b) => a.completed - b.completed);
                                                 return (
                                                     <div key={cat.id} className="animate-pop">
-                                                        <div className="flex items-center gap-3 mb-3">
+                                                        <div className="flex items-center gap-3 mb-2 px-1">
                                                             <span className={`text-sm font-black uppercase tracking-widest ${cat.color}`}>{cat.icon} {cat.label}</span>
                                                             <div className="h-[1px] flex-1 bg-slate-100"></div>
                                                         </div>
-                                                        <div className="space-y-1.5">
-                                                            {catItems.map(item => {
-                                                                const pObj = PRIORITIES.find(p => p.id === item.priority) || PRIORITIES[1];
-                                                                return (
-                                                                    <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100 hover:border-indigo-100'}`}>
-                                                                        <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500 shadow-inner' : 'border-2 border-slate-200'}`}>
-                                                                            {item.completed && <Icons.Check />}
-                                                                        </div>
-                                                                        <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
-                                                                            <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
-                                                                            <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
-                                                                            <span className="opacity-40">{pObj.icon}</span>
-                                                                        </div>
-                                                                        <div className="flex gap-1 shrink-0">
-                                                                            <button onClick={() => setEditingItem(item)} className="p-2 text-slate-300 hover:text-[#635BFF] transition-all"><Icons.Brush /></button>
-                                                                            <button onClick={() => setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}))} className="p-2 text-slate-300 hover:text-red-400 transition-all"><Icons.X /></button>
-                                                                        </div>
+                                                        <div className="space-y-1">
+                                                            {catItems.map(item => (
+                                                                <div key={item.id} className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-all ${item.completed ? 'bg-slate-50 opacity-40' : 'bg-white shadow-sm border-slate-100'}`}>
+                                                                    <div onClick={() => toggleItem(item.id)} className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center transition-all ${item.completed ? 'bg-green-500' : 'border-2 border-slate-200'}`}>
+                                                                        {item.completed && <Icons.Check />}
                                                                     </div>
-                                                                );
-                                                            })}
+                                                                    <div className="flex items-center flex-1 min-w-0 gap-2" onClick={() => toggleItem(item.id)}>
+                                                                        <span className={`font-bold text-base truncate grow ${item.completed ? 'line-through text-slate-400' : 'text-slate-800'}`}>{item.text}</span>
+                                                                        <span className="text-sm font-black text-[#635BFF] uppercase whitespace-nowrap">{item.quantity} {item.unit}</span>
+                                                                    </div>
+                                                                    <div className="flex gap-1 shrink-0">
+                                                                        <button onClick={() => setEditingItem(item)} className="p-2 text-slate-300 hover:text-[#635BFF] transition-all"><Icons.Brush /></button>
+                                                                        <button onClick={() => setItems(prev=>({...prev,[activeLoc]:prev[activeLoc].filter(i=>i.id!==item.id)}))} className="p-2 text-slate-300 hover:text-red-400 transition-all"><Icons.X /></button>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 );
@@ -398,28 +342,17 @@
                                 </main>
 
                                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-40 flex items-center gap-3">
-                                    <button onClick={sendInteractiveFile} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
-                                        <Icons.Send /> ОТПРАВИТЬ ФАЙЛ СПИСКА
+                                    <button onClick={shareInteractiveFile} className="flex-1 h-16 bg-[#121221] text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl active:scale-95 transition-all">
+                                        <Icons.Send /> ОТПРАВИТЬ СПИСОК
                                     </button>
                                     <button onClick={startVoice} className={`w-16 h-16 rounded-3xl flex items-center justify-center shadow-2xl active:scale-95 z-50 ${isListening ? 'bg-red-500 text-white mic-pulse' : 'bg-[#635BFF] text-white hover:bg-indigo-500'}`}><Icons.Mic /></button>
                                 </div>
                             </>
                         ) : (
                             <main className="flex-1 px-6 overflow-y-auto pb-10 pt-4 no-scrollbar">
-                                {!history.length ? <div className="py-20 flex flex-col items-center opacity-20 text-center"><span className="text-5xl mb-4">⌛</span><p className="font-bold text-sm uppercase">История пуста</p></div> : (
-                                    <div className="space-y-4 pb-20">
-                                        {history.map((h, i) => (
-                                            <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center animate-pop">
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-lg text-slate-700">{h.text}</span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{new Date(h.doneAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long' })}</span>
-                                                </div>
-                                                <span className="text-2xl opacity-30">{CATEGORIES.find(c=>c.id===h.category)?.icon}</span>
-                                            </div>
-                                        ))}
-                                        <button onClick={() => setHistory([])} className="w-full py-6 text-xs font-black uppercase text-slate-300 hover:text-red-400 transition-colors">Очистить историю</button>
-                                    </div>
-                                )}
+                                <div className="space-y-4 pb-20">
+                                    <p className="text-center text-slate-400 text-xs font-bold uppercase tracking-widest">История пуста</p>
+                                </div>
                             </main>
                         )}
 
@@ -430,7 +363,7 @@
                                         <h2 className="text-lg font-black text-slate-800">Правка</h2><button onClick={() => setEditingItem(null)} className="p-2 bg-slate-50 rounded-xl text-slate-400"><Icons.X /></button>
                                     </div>
                                     <div className="space-y-5">
-                                        <input type="text" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none focus:ring-2 focus:ring-[#635BFF]/10" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} />
+                                        <input type="text" className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-lg border border-slate-100 outline-none" value={editingItem.text} onChange={(e) => setEditingItem({...editingItem, text: e.target.value})} />
                                         <div className="relative">
                                             <select className="w-full bg-slate-50 rounded-2xl px-5 py-4 font-bold text-slate-700 text-base border border-slate-100 appearance-none cursor-pointer outline-none" value={editingItem.category} onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}>
                                                 {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
@@ -440,7 +373,7 @@
                                         <button onClick={() => { 
                                             const ns = {...items}; 
                                             ns[activeLoc] = ns[activeLoc].map(i => i.id === editingItem.id ? editingItem : i);
-                                            setItems(ns); setEditingItem(null); showToast('Сохранено!'); 
+                                            setItems(ns); setEditingItem(null); showToast('Сохранено'); 
                                         }} className="w-full bg-[#635BFF] py-5 rounded-3xl text-white font-black uppercase text-sm shadow-lg active:scale-95 transition-all mt-4 tracking-widest text-center">Сохранить</button>
                                     </div>
                                 </div>
